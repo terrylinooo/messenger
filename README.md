@@ -21,9 +21,9 @@ require 'Messenger/autoload.php';
 
 ### Telegram
 
-Add `BotFather` to start a new conversation. Type command `/newbot` to obtain your API key.
+Open your Telegram App, add `BotFather` to start a new conversation. Type command `/newbot` to obtain your API key.
 
-Remember, make your channel type public. If you want to send messages to your private channel, googling will find solutions.
+Remember, make sure your channel type is public. If you want to send messages to your private channel, googling will find solutions.
 
 ```php
 $apiKey = 'your_api_key';
