@@ -1,0 +1,18 @@
+sudo: false
+dist: trusty
+
+language: php
+
+branches:
+  only:
+    - master
+
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+
+script: composer test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

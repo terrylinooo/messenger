@@ -1,0 +1,40 @@
+{
+    "name": "shieldon/messenger",
+    "description": "Sending messages to the third-party API services made easy for PHP.",
+    "keywords": ["messenger", "message", "mailer"],
+    "homepage": "https://github.com/terrylinooo/messenger",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Terry Lin",
+            "email": "contact@terryl.in",
+            "homepage": "https://terryl.in",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Shieldon\\": "src/Messenger"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Shieldon\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "process-timeout": 0,
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}
+
