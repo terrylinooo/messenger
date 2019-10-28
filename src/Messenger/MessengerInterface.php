@@ -12,7 +12,7 @@ namespace Messenger;
 
 /**
  * Messenger Interface
- * 
+ *
  * @author Terry L. <contact@terryl.in>
  * @since 1.0.0
  */

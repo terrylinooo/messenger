@@ -10,6 +10,7 @@
 
 namespace Messenger;
 
+use Messenger\MessengerInterface;
 use RuntimeException;
 
 use function curl_errno;

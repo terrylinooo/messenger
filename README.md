@@ -30,7 +30,7 @@ $apiKey = 'your_api_key';
 $channel = '@your_channel';
 
 $telegram = new \Messenger\Telegram($apiKey, $channel);
-$telegram->send($hello);
+$telegram->send('say something!');
 ```
 
 ### Line Notify
@@ -42,8 +42,23 @@ Once you have obtained your developer access token for the chat group you choose
 ```php
 $accessToken = 'your_access_token';
 
-$messenger = new \Messenger\LineNotify($accessToken);
-$messenger->send($hello);
+$line = new \Messenger\LineNotify($accessToken);
+$line->send('say something!');
+```
+
+### SendGrid
+
+If you have SendGrid API key, you can also send messages via SendGrid easily.
+
+```php
+$apiKey = 'your_api_key';
+
+$sendgrid = new \Messenger\Sendgrid($apiKey);
+$sendgrid->addSender('example.sender@gmail.com');
+$sendgrid->addRecipient('example.recipient@gmail.com');
+$sendgrid->setSubject('Foo, bar.')
+
+$sendgrid->send('say something!');
 ```
 
 ### More classes will come.

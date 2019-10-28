@@ -10,6 +10,7 @@
 
 namespace Messenger;
 
+use Messenger\MessengerInterface;
 use RuntimeException;
 
 use function curl_errno;
@@ -80,6 +81,7 @@ class Telegram implements MessengerInterface
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -87,7 +89,7 @@ class Telegram implements MessengerInterface
             'text' => $message,
             'chat_id' => $this->channel,
         ]));
-    
+
         $result = curl_exec($ch);
 
         if (! curl_errno($ch)) {
