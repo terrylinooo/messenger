@@ -21,12 +21,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Shieldon\\": "src/Messenger"
+            "Messenger\\": "src/Messenger"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Shieldon\\Tests\\": "tests"
+            "Messenger\\Tests\\": "tests"
         }
     },
     "config": {
