@@ -107,12 +107,54 @@ class Mailgun extends AbstractMailer implements MessengerInterface
      */
     protected function prepare(string $message): array
     {
-        return [
-            'from' => $this->sender['email'],
-            'to' => $to,
-            'subject' => $subject,
-            'html' => $message,
-            'text' => $plain
-        ];
+        $type = $this->getContentType($message);
+        $data = [];
+
+        foreach($this->recipients as $i => $recipient) {
+
+            if ($recipient['type'] === 'cc') {
+                $ccRecipients[$i]['name'] = $recipient['name'];
+                $ccRecipients[$i]['email'] = $recipient['email'];
+                $ccRecipients[$i]['type'] = $recipient['type'];
+
+            } else if ($recipient['type'] === 'bcc') {
+                $bccRecipients[$i]['name'] = $recipient['name'];
+                $bccRecipients[$i]['email'] = $recipient['email'];
+                $bccRecipients[$i]['type'] = $recipient['type'];
+
+            } else {
+                $toRecipients[$i]['name'] = $recipient['name'];
+                $toRecipients[$i]['email'] = $recipient['email'];
+                $toRecipients[$i]['type'] = $recipient['type'];
+            }
+        }
+
+        if (! empty($toRecipients)) {
+            $data['to'] = $toRecipients;
+        }
+
+        if (! empty($ccRecipients)) {
+            $data['cc'] = $ccRecipients;
+        }
+
+        if (! empty($bccRecipients)) {
+            $data['bcc'] = $bccRecipients;
+        }
+
+        // Mailgun does not allow sending email with cc or bcc only.
+        if ((isset($bccRecipients) || isset($ccRecipients)) && empty($toRecipients)) {
+            $data['to'] = $this->sender['email'];
+        }
+
+        $data['from'] = $this->sender['email'];
+        $data['subject'] = $this->subject;
+        $data['text'] = $message;
+
+        if ('text/html' === $type) {
+            $data['html'] = $message;
+            unset($data['text']);
+        }
+
+        return $data;
     }
 }

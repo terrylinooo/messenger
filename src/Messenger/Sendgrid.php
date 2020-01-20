@@ -124,20 +124,21 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
         $bccRecipients = []; // bcc: blind carbon copy
 
         foreach($this->recipients as $i => $recipient) {
-            $toRecipients[$i]['name'] = $recipient['name'];
-            $toRecipients[$i]['email'] = $recipient['email'];
-            $toRecipients[$i]['type'] = $recipient['type'];
 
             if ($recipient['type'] === 'cc') {
                 $ccRecipients[$i]['name'] = $recipient['name'];
                 $ccRecipients[$i]['email'] = $recipient['email'];
                 $ccRecipients[$i]['type'] = $recipient['type'];
-            }
-            
-            if ($recipient['type'] === 'bcc') {
+
+            } else if ($recipient['type'] === 'bcc') {
                 $bccRecipients[$i]['name'] = $recipient['name'];
                 $bccRecipients[$i]['email'] = $recipient['email'];
                 $bccRecipients[$i]['type'] = $recipient['type'];
+
+            } else {
+                $toRecipients[$i]['name'] = $recipient['name'];
+                $toRecipients[$i]['email'] = $recipient['email'];
+                $toRecipients[$i]['type'] = $recipient['type'];
             }
         }
 
