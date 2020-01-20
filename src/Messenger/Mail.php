@@ -52,7 +52,7 @@ class Mail extends AbstractMailer implements MessengerInterface
         $subject = $this->subject;
 
         foreach($this->recipients as $recipient) {
-            mail($recipient, $subject, $message, $headers);
+            @mail($recipient['email'], $subject, $message, $headers);
         }
     }
 
