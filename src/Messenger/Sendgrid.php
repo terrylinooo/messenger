@@ -23,7 +23,7 @@ use function curl_setopt;
 use function json_encode;
 
 /**
- * LineNotify Messenger
+ * Send message through Sendgrid API.
  * 
  * @author Terry L. <contact@terryl.in>
  * @since 1.0.0
@@ -31,8 +31,7 @@ use function json_encode;
 class Sendgrid extends AbstractMailer implements MessengerInterface
 {
     /**
-     * This access token is obtained by clicking `Generate token` button
-     * at https://notify-bot.line.me/my/
+     * The API key that you have applied for from Sendgrid.
      *
      * @var string
      */
@@ -45,9 +44,9 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
      */
     private $timeout = 5;
 
-
     /**
      * @param string $apiKey Your SendGrid API key.
+     * @param int    $timeout     After n seconds the connection will be stopped.
      */
     public function __construct(string $apiKey, int $timeout = 5)
     {
@@ -58,9 +57,9 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
     /**
      * @inheritDoc
      */
-    public function send(string $message, array $logData = []): void
+    public function send(string $message): void
     {
-        $message = $this->prepare($message, $logData);
+        $message = $this->prepare($message);
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
@@ -106,10 +105,12 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
 
     /**
      * Prepare Sendgrid v3 data structure.
+     * 
+     * @param string Message body.
      *
      * @return string JSON formatted string.
      */
-    protected function prepare(string $message, array $logData = []): string
+    protected function prepare(string $message): string
     {
         $data = new stdClass();
 
@@ -158,24 +159,6 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
 
         $data->content[0] = new stdClass();
         $data->content[0]->type = $this->getContentType($message);
-
-        if (! empty($logData)) {
-
-            if ($data->content[0]->type === 'text/plain') {
-                $wrap = "\n";
-            }
-
-            if ($data->content[0]->type === 'text/html') {
-                $wrap = "<br>";
-            }
-
-            $message .= $wrap;
-            foreach ($logData as $key => $value) {
-                $message .= $key . ': ' . $value . $wrap;
-            }
-            $message .= $wrap;
-        }
-
         $data->content[0]->value = $message;
 
         return json_encode($data);

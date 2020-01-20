@@ -44,6 +44,7 @@ class LineNotify implements MessengerInterface
 
     /**
      * @param string $accessToken The developer access token.
+     * @param int    $timeout     After n seconds the connection will be stopped.
      */
     public function __construct(string $accessToken, int $timeout = 5)
     {
@@ -54,16 +55,8 @@ class LineNotify implements MessengerInterface
     /**
      * @inheritDoc
      */
-    public function send(string $message, array $logData = []): void
+    public function send(string $message): void
     {
-        if (! empty($logData)) {
-            $message .= "\n";
-
-            foreach ($logData as $key => $value) {
-                $message .= $key . ': ' . $value . "\n";
-            }
-        }
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);

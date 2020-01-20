@@ -40,7 +40,7 @@ abstract class AbstractMailer implements MailerInterface
      *
      * @var string
      */
-    protected $subject = 'Please use setSubject() to define the email subject!';
+    protected $subject = '';
 
     /**
      * @inheritDoc
@@ -53,7 +53,7 @@ abstract class AbstractMailer implements MailerInterface
 
         $this->sender['email'] = $sender['email'];
         $this->sender['name']  = $this->getPrettyName($sender['email']);
-        $this->sender['type']  = $sender['type'] ?? 'to';
+        $this->sender['type']  = $sender['type'] ?? 'from';
 
         $this->sender = $sender;
     }
@@ -69,7 +69,7 @@ abstract class AbstractMailer implements MailerInterface
 
         $this->sender['email'] = $sender;
         $this->sender['name']  = $this->getPrettyName($sender);
-        $this->sender['type']  = $sender['type'] ?? 'to';
+        $this->sender['type']  = $sender['type'] ?? 'from';
     }
 
     /**
