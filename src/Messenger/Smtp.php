@@ -24,7 +24,9 @@ use function fclose;
  * 
  * This class is just for sending message simply. As a part of Shieldon Messenger, we can 
  * just keep it as simple as possible, so if you are looking for a completely featured SMTP 
- * class, using PHP Mailer (https://github.com/PHPMailer/PHPMailer) instead. 
+ * class, using PHP Mailer (https://github.com/PHPMailer/PHPMailer) instead.
+ * 
+ * This blog post is also a good study: https://blog.mailtrap.io/cc-bcc-in-smtp/
  *
  * @author Terry L. <contact@terryl.in>
  * @since 1.1.0
@@ -83,7 +85,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
     /**
      * Connect to SMTP server and then send message.
      * 
-     * See: https://tools.ietf.org/html/rfc821
+     * @see https://tools.ietf.org/html/rfc821
      *      https://tools.ietf.org/html/rfc2821
      *
      * @inheritDoc
@@ -92,49 +94,96 @@ class Smtp extends AbstractMailer implements MessengerInterface
      */
     function send(string $message): void
     {
+        // Prepare the recipient data.
+        $toRecipients = [];
+        $ccRecipients = [];
+        $bccRecipients = [];
+
+        foreach($this->recipients as $i => $recipient) {
+            if ($recipient['type'] === 'cc') {
+                $ccRecipients[$i]['name'] = $recipient['name'];
+                $ccRecipients[$i]['email'] = $recipient['email'];
+
+            } else if ($recipient['type'] === 'bcc') {
+                $bccRecipients[$i]['name'] = $recipient['name'];
+                $bccRecipients[$i]['email'] = $recipient['email'];
+
+            } else {
+                $toRecipients[$i]['name'] = $recipient['name'];
+                $toRecipients[$i]['email'] = $recipient['email'];
+            }
+        }
+
         // transmit them only as a <CRLF> sequence.
         $ln = "\r\n";
 
         // The default is iso-8859-1, but using UTF-8 instead.
         $charset = 'UTF-8';
-
         $type = $this->getContentType($message);
-
         $headers = 'MIME-Version: 1.0' . $ln;  
-        $headers .= 'Content-type: ' . $type . '; charset=' . $charset . $ln;  
+        $headers .= 'Content-type: ' . $type . '; charset=' . $charset . $ln;
+        $headers .= 'X-Mailer: Shieldon Messenger' . $ln;
 
         // Let's talk to SMTP server.
         if ($smtp = @fsockopen($this->host, $this->port)) {
 
+            // RFC 821 - 3.5
+            // Open a transmission channel.
             fputs($smtp, 'EHLO ' . $_SERVER['HTTP_HOST'] . $ln);
-            $talk['hello'] = fgets($smtp, 1024); 
+            $talk['hello'] = fgets($smtp, 1024);
 
-            fputs($smtp, 'auth login' . $ln);
+            fputs($smtp, 'AUTH LOGIN' . $ln);
             $talk['res'] = fgets($smtp, 1024);
 
+            // Transmit the username to SMTP server.
             fputs($smtp, $this->user . $ln);
             $talk['user'] = fgets($smtp, 1024);
 
+            // Transmit the password to SMTP server.
             fputs($smtp, $this->pass . $ln);
             $talk['pass'] = fgets($smtp, 256);
 
-            fputs ($smtp, 'MAIL FROM: <' . $this->from . '>' . $ln); 
-            $talk['From'] = fgets($smtp, 1024); 
+            fputs ($smtp, 'MAIL FROM: <' . $this->sender['email'] . '>' . $ln); 
+            $talk['From'] = fgets($smtp, 1024);
 
-            fputs ($smtp, 'RCPT TO: <' . $this->to . '>' . $ln); 
-            $talk['To'] = fgets($smtp, 1024); 
+            // Apply the recipient list.
+            foreach ($toRecipients as $recipient) {
+                fputs ($smtp, 'RCPT TO: <' . $recipient['email'] . '>' . $ln); 
+                $talk['To'] = fgets($smtp, 1024);
+            }
 
-            fputs($smtp, 'DATA' . "\r\n");
+            foreach ($ccRecipients as $recipient) {
+                fputs ($smtp, 'RCPT TO: <' . $recipient['email'] . '>' . $ln); 
+                $talk['Cc'] = fgets($smtp, 1024);
+            }
+
+            foreach ($bccRecipients as $recipient) {
+                fputs ($smtp, 'RCPT TO: <' . $recipient['email'] . '>' . $ln); 
+                $talk['Bcc'] = fgets($smtp, 1024);
+            }
+
+            // Let's build DATA content.
+            fputs($smtp, 'DATA' . $ln);
             $talk['data'] = fgets($smtp, 1024);
 
+            $to = '';
+            foreach ($toRecipients as $recipient) {
+                $to .= 'To: <' . $recipient['email'] . '>' . $ln;
+            }
+
+            $cc = '';
+            foreach ($ccRecipients as $recipient) {
+                $cc .= 'Cc: <' . $recipient['email'] . '>' . $ln;
+            }
+
             fputs($smtp, '
-                From: <' . $this->from . '>' . $ln . '
-                To: <' . $this->to . '>' .     $ln . 
-                $headers .                     $ln . '
-                Subject: ' . $this->subject .  $ln . 
-                                               $ln . 
-                $this->body .                  $ln . 
-                '.' .                          $ln
+                From: <'   . $this->sender['email'] . '>' . $ln . '
+                '          . $to                          . $ln . '
+                '          . $cc                          . $ln . '
+                '          . $headers                     . $ln . '
+                Subject: ' . $this->subject               . $ln . '
+                '          . $message                     . $ln . '
+                .'         . $ln                          // terminated by `<CRLF>.<CRLF>`
             );
             $talk['send'] = fgets($smtp, 256);
 
@@ -147,6 +196,14 @@ class Smtp extends AbstractMailer implements MessengerInterface
         }
 
         $this->connection = $talk;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function provider(): string
+    {
+        return '';
     }
 
     /**
