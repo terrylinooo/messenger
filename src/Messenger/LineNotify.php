@@ -38,7 +38,7 @@ class LineNotify implements MessengerInterface
     /**
      * The connection timeout when calling Telegram API.
      *
-     * @var integer
+     * @var int
      */
     private $timeout = 5;
 
@@ -63,15 +63,12 @@ class LineNotify implements MessengerInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_POST, 1 );
-
-        $headers = [
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "message=$message");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-type: '  . 'application/x-www-form-urlencoded',
             'Authorization: ' . 'Bearer ' . $this->accessToken,
-        ];
-    
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "message=$message");
+        ]);
 
         $result = curl_exec($ch);
 

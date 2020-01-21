@@ -50,7 +50,7 @@ class Telegram implements MessengerInterface
     /**
      * The connection timeout when calling Telegram API.
      *
-     * @var integer
+     * @var int
      */
     private $timeout = 5;
 

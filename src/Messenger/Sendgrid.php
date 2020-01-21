@@ -40,7 +40,7 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
     /**
      * The connection timeout when calling Telegram API.
      *
-     * @var integer
+     * @var int
      */
     private $timeout = 5;
 
@@ -63,13 +63,13 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $message);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Authorization: Bearer ' . $this->apiKey,
