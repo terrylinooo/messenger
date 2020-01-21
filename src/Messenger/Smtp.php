@@ -69,6 +69,20 @@ class Smtp extends AbstractMailer implements MessengerInterface
     protected $connection = [];
 
     /**
+     * Socket resource instance.
+     *
+     * @var resource
+     */
+    private $smtp;
+
+    /**
+     * Debug mode.
+     *
+     * @var bool
+     */
+    private $debug = false;
+
+    /**
      * @param string $user The username that you want to use to login to SMTP server.
      * @param string $pass The password of that user,
      * @param string $host The FQDN or IP address of the target SMTP server
@@ -114,57 +128,44 @@ class Smtp extends AbstractMailer implements MessengerInterface
             }
         }
 
-        // transmit them only as a <CRLF> sequence.
-        $ln = "\r\n";
-
-        // The default is iso-8859-1, but using UTF-8 instead.
-        $charset = 'UTF-8';
-        $type = $this->getContentType($message);
-        $headers = 'MIME-Version: 1.0' . $ln;  
-        $headers .= 'Content-type: ' . $type . '; charset=' . $charset . $ln;
-        $headers .= 'X-Mailer: Shieldon Messenger' . $ln;
-
         // Let's talk to SMTP server.
-        if ($smtp = @fsockopen($this->host, $this->port)) {
+        if ($this->smtp = @fsockopen($this->host, $this->port, $errno, $errstr, 15)) {
+
+            $talk['connection'] = $this->talk($this->smtp, 220);
 
             // RFC 821 - 3.5
             // Open a transmission channel.
-            fputs($smtp, 'EHLO ' . $_SERVER['HTTP_HOST'] . $ln);
-            $talk['hello'] = fgets($smtp, 1024);
-
-            fputs($smtp, 'AUTH LOGIN' . $ln);
-            $talk['res'] = fgets($smtp, 1024);
+    
+            $talk['hello'] = $this->sendCmd('HELO ' . $_SERVER['SERVER_NAME'], 250);
+            $talk['resource'] = $this->sendCmd('AUTH LOGIN', 334);
 
             // Transmit the username to SMTP server.
-            fputs($smtp, $this->user . $ln);
-            $talk['user'] = fgets($smtp, 1024);
+            $talk['user'] = $this->sendCmd(base64_encode($this->user), 334);
 
             // Transmit the password to SMTP server.
-            fputs($smtp, $this->pass . $ln);
-            $talk['pass'] = fgets($smtp, 256);
+            $talk['pass'] = $this->sendCmd(base64_encode($this->pass), 235);
 
-            fputs ($smtp, 'MAIL FROM: <' . $this->sender['email'] . '>' . $ln); 
-            $talk['From'] = fgets($smtp, 1024);
+            $talk['from'] = $this->sendCmd('MAIL FROM: <' . $this->user . '>', 250);
 
             // Apply the recipient list.
-            foreach ($toRecipients as $recipient) {
-                fputs ($smtp, 'RCPT TO: <' . $recipient['email'] . '>' . $ln); 
-                $talk['To'] = fgets($smtp, 1024);
+            foreach ($toRecipients as $recipient) { 
+                $talk['to'] = $this->sendCmd('RCPT TO: <' . $recipient['email'] . '>', 250);
             }
 
             foreach ($ccRecipients as $recipient) {
-                fputs ($smtp, 'RCPT TO: <' . $recipient['email'] . '>' . $ln); 
-                $talk['Cc'] = fgets($smtp, 1024);
+                $talk['cc'] =  $this->sendCmd('RCPT TO: <' . $recipient['email'] . '>', 250);
             }
 
             foreach ($bccRecipients as $recipient) {
-                fputs ($smtp, 'RCPT TO: <' . $recipient['email'] . '>' . $ln); 
-                $talk['Bcc'] = fgets($smtp, 1024);
+                $talk['bcc'] =  $this->sendCmd('RCPT TO: <' . $recipient['email'] . '>', 250);
             }
 
             // Let's build DATA content.
-            fputs($smtp, 'DATA' . $ln);
-            $talk['data'] = fgets($smtp, 1024);
+
+            $talk['data'] =  $this->sendCmd('DATA', 354);
+
+            // transmit them only as a <CRLF> sequence.
+            $ln = "\r\n";
 
             $to = '';
             foreach ($toRecipients as $recipient) {
@@ -176,22 +177,36 @@ class Smtp extends AbstractMailer implements MessengerInterface
                 $cc .= 'Cc: <' . $recipient['email'] . '>' . $ln;
             }
 
-            fputs($smtp, '
-                From: <'   . $this->sender['email'] . '>' . $ln . '
-                '          . $to                          . $ln . '
-                '          . $cc                          . $ln . '
-                '          . $headers                     . $ln . '
-                Subject: ' . $this->subject               . $ln . '
-                '          . $message                     . $ln . '
-                .'         . $ln                          // terminated by `<CRLF>.<CRLF>`
-            );
-            $talk['send'] = fgets($smtp, 256);
+            // The default is iso-8859-1, but using UTF-8 instead.
+            $charset = 'utf-8';
+            $type = $this->getContentType($message);
 
-            fputs($smtp, 'QUIT' . "\r\n"); 
-            fclose($smtp); 
+            $headers = '';
+            $headers .= $to;
+            $headers .= 'Subject: ' . $this->subject . $ln;
+            $headers .= 'From: <' . $this->sender['email'] . '>' . $ln;
+            $headers .= 'Reply-To: <' . $this->sender['email'] . '>' . $ln;
+            $headers .= 'Return-Path: ' . $this->sender['email'] . $ln;
+            $headers .= $cc;
+            $headers .= 'X-Mailer: Shieldon Messenger' . $ln;
+            $headers .= 'MIME-Version: 1.0' . $ln;  
+            $headers .= 'Content-type: ' . $type . '; charset=' . $charset . $ln;
+
+            $body = $headers . $message . $ln . '.' . $ln;
+
+            $talk['send'] = $this->sendCmd($body, 250);
+
+            $this->sendCmd('QUIT');
+            fclose($this->smtp);
+
+        } else {
+
+            if ($this->debug) {
+                throw new RuntimeException('Error occurred when connecting to ' . $this->host . ' (#' . $errno . ' - ' . $errstr . ')');
+            }
         }
 
-        if (empty($talk)) {
+        if (empty($talk) && $this->debug) {
             throw new RuntimeException('PHP fsockopen() is not supported on your system.');
         }
 
@@ -220,5 +235,59 @@ class Smtp extends AbstractMailer implements MessengerInterface
         }
 
         return $data;
+    }
+
+    /**
+     * Debug mode.
+     *
+     * @return void
+     */
+    public function debugMode(bool $mode = false)
+    {
+        $this->debug = $mode;
+    }
+
+    /**
+     * Send command to SMTP server.
+     *
+     * @param string $command
+     * @param string $expect
+     *
+     * @return string
+     */
+    private function sendCmd(string $command, int $expect = 0)
+    {
+        fputs($this->smtp, $command . "\r\n");
+
+        return $this->talk($this->smtp, $expect);
+    }
+
+    /**
+     * Talk to SMTP server.
+     *
+     * @param mixed $socket Object or false.
+     * @param int   $answer Expected answer.
+     *
+     * @return void
+     */
+    private function talk($socket, $answer)
+    {
+        $success = false;
+
+        $responseBody = fgets($socket, 1024);
+
+        if ($this->debug && substr($responseBody, 3, 1) !== ' ' && !$responseBody) {
+            throw new RuntimeException('Unable to fetch expected response.');
+        }
+ 
+        if (! empty($responseBody) && substr($responseBody, 0, 3) === $answer) {
+            $success = true;
+        }
+
+        if ($this->debug && ! $success) {
+            throw new RuntimeException('Unable to send email.)');
+        }
+
+        return $responseBody ?? 'Failed.';
     }
 }
