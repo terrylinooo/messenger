@@ -24,7 +24,7 @@ use function curl_setopt;
  * Send message through Mailgun API.
  * 
  * @author Terry L. <contact@terryl.in>
- * @since 1.1.0
+ * @since 1.3.0
  */
 class Mailgun extends AbstractMailer implements MessengerInterface
 {
@@ -113,19 +113,13 @@ class Mailgun extends AbstractMailer implements MessengerInterface
         foreach($this->recipients as $i => $recipient) {
 
             if ($recipient['type'] === 'cc') {
-                $ccRecipients[$i]['name'] = $recipient['name'];
-                $ccRecipients[$i]['email'] = $recipient['email'];
-                $ccRecipients[$i]['type'] = $recipient['type'];
+                $ccRecipients[$i] = $recipient['email'];
 
             } else if ($recipient['type'] === 'bcc') {
-                $bccRecipients[$i]['name'] = $recipient['name'];
-                $bccRecipients[$i]['email'] = $recipient['email'];
-                $bccRecipients[$i]['type'] = $recipient['type'];
+                $bccRecipients[$i] = $recipient['email'];
 
             } else {
-                $toRecipients[$i]['name'] = $recipient['name'];
-                $toRecipients[$i]['email'] = $recipient['email'];
-                $toRecipients[$i]['type'] = $recipient['type'];
+                $toRecipients[$i] = $recipient['email'];
             }
         }
 

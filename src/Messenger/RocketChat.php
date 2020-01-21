@@ -26,7 +26,7 @@ use function json_encode;
  * reference: https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/
  * 
  * @author Terry L. <contact@terryl.in>
- * @since 1.1.0
+ * @since 1.3.0
  */
 class RocketChat implements MessengerInterface
 {

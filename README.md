@@ -133,14 +133,15 @@ try {
 
 ### Gmail
 
-Extened from `Smtp`, a ready-to-use Gmail SMTP client.
+Extended from `Smtp`, a ready-to-use Gmail SMTP client.
+
+#### Note: 
 
 Google doesn't like people use their SMTP server to sending email by scripts, to make sure it can work without problems, you have to set the settings right:
 
-1. Check your Google Accounts -> Access for less secure apps -> Turn on
-2. Use your host where you use to send email with your Google account and confirm that 
+- Check your Google Accounts -> Access for less secure apps -> Turn on
+- Use your host where you use to send email with your Google account and confirm that you have trusted the device on.
 
-Good luck.
 
 ```php
 
@@ -165,8 +166,6 @@ try {
     echo 'Caught exception: ',  $e->getMessage(), "\n";
 }
 ```
-
-### More classes will come.
 
 ## Author
 

@@ -27,7 +27,7 @@ use Messenger\MessengerInterface;
  *    Good luck.
  *
  * @author Terry L. <contact@terryl.in>
- * @since 1.1.0
+ * @since 1.3.0
  */
 class Gmail extends Smtp implements MessengerInterface
 {

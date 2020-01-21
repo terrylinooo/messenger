@@ -19,7 +19,7 @@ use function mail;
  * Send message by PHP's bulit-in mail() function.
  * 
  * @author Terry L. <contact@terryl.in>
- * @since 1.1.0
+ * @since 1.3.0
  */
 class Mail extends AbstractMailer implements MessengerInterface
 {

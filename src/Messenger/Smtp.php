@@ -29,7 +29,7 @@ use function fclose;
  * This blog post is also a good study: https://blog.mailtrap.io/cc-bcc-in-smtp/
  *
  * @author Terry L. <contact@terryl.in>
- * @since 1.1.0
+ * @since 1.3.0
  */
 class Smtp extends AbstractMailer implements MessengerInterface
 {
