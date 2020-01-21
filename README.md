@@ -61,6 +61,111 @@ $sendgrid->setSubject('Foo, bar.')
 $sendgrid->send('say something!');
 ```
 
+### MailGun
+
+```php
+$apiKey = 'your_api_key';
+$domain = 'your_domain_name';
+
+$sendgrid = new \Messenger\Mailgun($apiKey, $domain);
+$sendgrid->addSender('example.sender@gmail.com');
+$sendgrid->addRecipient('example.recipient@gmail.com');
+$sendgrid->setSubject('Foo, bar.')
+
+$sendgrid->send('say something!');
+```
+
+### RocketChat
+
+```php
+$accessToken = 'your_auth_token';
+$userId = 'your_user_id';
+$serverUrl = 'https://your_rocket_chat.com:3000';
+$channel = '#general';
+
+$rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $channel);
+$rocketChat->send('say something!');
+```
+
+### Mail
+
+Native PHP mail function.
+
+```php
+$mail = new \Messenger\Mail();
+$mail->addSender('example.sender@gmail.com');
+$mail->addRecipient('example.recipient@gmail.com');
+$mail->setSubject('Foo, bar.')
+
+$mail->send('say something!');
+```
+
+### Smtp
+
+A very simple SMTP client.
+
+```php
+
+$user = 'email@your_domain.com';
+$pass = '12345678';
+$host = '127.0.0.1';
+$port = '25';
+
+$mail = new \Messenger\Smtp($user, $pass, $host, $port);
+
+$mail->addSender('email@your_domain.com');
+$mail->addRecipient('do-not-reply@gmail.com');
+$mail->setSubject('Foo, bar.');
+
+try {
+    $mail->send('say something!');
+
+    $result = $mail->printResult();
+    
+    // For debugging purpose.
+    echo nl2br($result);
+
+} catch (Exception $e) {
+    echo 'Caught exception: ',  $e->getMessage(), "\n";
+}
+
+```
+
+### Gmail
+
+Extened from `Smtp`, a ready-to-use Gmail SMTP client.
+
+Google doesn't like people use their SMTP server to sending email by scripts, to make sure it can work without problems, you have to set the settings right:
+
+1. Check your Google Accounts -> Access for less secure apps -> Turn on
+2. Use your host where you use to send email with your Google account and confirm that 
+
+Good luck.
+
+```php
+
+$user = 'your@gmail.com';
+$pass = 'your_password';
+
+$gmail = new \Messenger\Gmail($user, $pass);
+
+$gmail->addSender('your@gmail.com');
+$gmail->addRecipient('test@gmail.com');
+$gmail->setSubject('Foo, bar.');
+
+try {
+    $mail->send('say something!');
+
+    $result = $mail->printResult();
+    
+    // For debugging purpose.
+    echo nl2br($result);
+
+} catch (Exception $e) {
+    echo 'Caught exception: ',  $e->getMessage(), "\n";
+}
+```
+
 ### More classes will come.
 
 ## Author
