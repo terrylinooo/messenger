@@ -66,7 +66,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
      *
      * @var array
      */
-    protected $connection = [];
+    private $resultData = [];
 
     /**
      * Socket resource instance.
@@ -83,17 +83,26 @@ class Smtp extends AbstractMailer implements MessengerInterface
     private $debug = false;
 
     /**
-     * @param string $user The username that you want to use to login to SMTP server.
-     * @param string $pass The password of that user,
-     * @param string $host The FQDN or IP address of the target SMTP server
-     * @param int    $port The port of the target SMTP server.
+     * The connection timeout when calling SMTP server.
+     *
+     * @var int
      */
-    public function __construct(string $user, string $pass, string $host, int $port)
+    private $timeout = 5;
+
+    /**
+     * @param string $user    The username that you want to use to login to SMTP server.
+     * @param string $pass    The password of that user,
+     * @param string $host    The FQDN or IP address of the target SMTP server
+     * @param int    $port    The port of the target SMTP server.
+     * @param int    $timeout After n seconds the connection will be stopped.
+     */
+    public function __construct(string $user, string $pass, string $host, int $port, int $timeout = 5)
     {
         $this->user = $user;
         $this->pass = $pass;
         $this->host = $host;
         $this->port = $port;
+        $this->timeout = $timeout;
     }
 
     /**
@@ -106,7 +115,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
      *
      * @return void
      */
-    function send(string $message): void
+    public function send(string $message): void
     {
         // Prepare the recipient data.
         $toRecipients = [];
@@ -129,7 +138,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
         }
 
         // Let's talk to SMTP server.
-        if ($this->smtp = @fsockopen($this->host, $this->port, $errno, $errstr, 15)) {
+        if ($this->smtp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
 
             $talk['connection'] = $this->talk($this->smtp, 220);
 
@@ -210,7 +219,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
             throw new RuntimeException('PHP fsockopen() is not supported on your system.');
         }
 
-        $this->connection = $talk;
+        $this->resultData = $talk;
     }
 
     /**
@@ -230,7 +239,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
     {
         $data = '';
 
-        foreach ($this->connection as $key => $value) {
+        foreach ($this->resultData as $key => $value) {
             $data .= $key . ': ' . $value . "\n";
         }
 
