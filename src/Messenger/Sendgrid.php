@@ -25,6 +25,8 @@ use function json_encode;
 /**
  * Send message through Sendgrid API.
  * 
+ * @see https://sendgrid.com/docs/API_Reference/api_v3.html
+ * 
  * @author Terry L. <contact@terryl.in>
  * @since 1.0.0
  */
@@ -128,17 +130,14 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
             if ($recipient['type'] === 'cc') {
                 $ccRecipients[$i]['name'] = $recipient['name'];
                 $ccRecipients[$i]['email'] = $recipient['email'];
-                $ccRecipients[$i]['type'] = $recipient['type'];
 
             } else if ($recipient['type'] === 'bcc') {
                 $bccRecipients[$i]['name'] = $recipient['name'];
                 $bccRecipients[$i]['email'] = $recipient['email'];
-                $bccRecipients[$i]['type'] = $recipient['type'];
 
             } else {
                 $toRecipients[$i]['name'] = $recipient['name'];
                 $toRecipients[$i]['email'] = $recipient['email'];
-                $toRecipients[$i]['type'] = $recipient['type'];
             }
         }
 
@@ -154,6 +153,12 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
 
         if (! empty($bccRecipients)) {
             $data->personalizations[0]->bcc = $bccRecipients;
+        }
+
+        if (! empty($this->replyTo)) {
+            $data->reply_to = new stdClass();
+            $data->reply_to->email = $this->sender['email'];
+            $data->reply_to->name = $this->sender['name'];
         }
 
         $data->subject = $this->subject;

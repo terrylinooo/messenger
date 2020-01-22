@@ -72,7 +72,7 @@ class Mailgun extends AbstractMailer implements MessengerInterface
         curl_setopt($ch, CURLOPT_URL, $this->provider());
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $message);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($message));
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -95,7 +95,7 @@ class Mailgun extends AbstractMailer implements MessengerInterface
      */
     public function provider(): string
     {
-        return 'https://api.mailgun.net/v2/' . $this->domain . '/messages';
+        return 'https://api.mailgun.net/v3/' . $this->domain . '/messages';
     }
 
     /**

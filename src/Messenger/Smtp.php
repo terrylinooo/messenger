@@ -117,25 +117,13 @@ class Smtp extends AbstractMailer implements MessengerInterface
      */
     public function send(string $message): void
     {
-        // Prepare the recipient data.
-        $toRecipients = [];
-        $ccRecipients = [];
-        $bccRecipients = [];
+        $this->type = $this->getContentType($message);
 
-        foreach($this->recipients as $i => $recipient) {
-            if ($recipient['type'] === 'cc') {
-                $ccRecipients[$i]['name'] = $recipient['name'];
-                $ccRecipients[$i]['email'] = $recipient['email'];
-
-            } else if ($recipient['type'] === 'bcc') {
-                $bccRecipients[$i]['name'] = $recipient['name'];
-                $bccRecipients[$i]['email'] = $recipient['email'];
-
-            } else {
-                $toRecipients[$i]['name'] = $recipient['name'];
-                $toRecipients[$i]['email'] = $recipient['email'];
-            }
+        if ($this->type !== 'text/html') {
+            $message = wordwrap($message, 70);
         }
+
+        $header = $this->getHeader();
 
         // Let's talk to SMTP server.
         if ($this->smtp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
@@ -154,69 +142,66 @@ class Smtp extends AbstractMailer implements MessengerInterface
             // Transmit the password to SMTP server.
             $talk['pass'] = $this->sendCmd(base64_encode($this->pass), 235);
 
-            $talk['from'] = $this->sendCmd('MAIL FROM: <' . $this->user . '>', 250);
+            $talk['from'] = $this->sendCmd('MAIL FROM: <' . $this->sender['email'] . '>', 250);
+
+
 
             // Apply the recipient list.
-            foreach ($toRecipients as $recipient) { 
-                $talk['to'] = $this->sendCmd('RCPT TO: <' . $recipient['email'] . '>', 250);
+            foreach($this->recipients as $i => $recipient) {
+
+                if ($recipient['type'] === 'cc') {
+                    $ccRecipients[$i] = $recipient['email'];
+
+                } else if ($recipient['type'] === 'bcc') {
+                    $bccRecipients[$i] = $recipient['email'];
+
+                } else {
+                    $toRecipients[$i] = $recipient['email'];
+                }
             }
 
-            foreach ($ccRecipients as $recipient) {
-                $talk['cc'] =  $this->sendCmd('RCPT TO: <' . $recipient['email'] . '>', 250);
+            if (! empty($toRecipients)) {
+                foreach ($toRecipients as $recipient) { 
+                    $talk['to'] = $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
+                }
             }
 
-            foreach ($bccRecipients as $recipient) {
-                $talk['bcc'] =  $this->sendCmd('RCPT TO: <' . $recipient['email'] . '>', 250);
+            if (! empty($ccRecipients)) {
+                foreach ($ccRecipients as $recipient) {
+                    $talk['cc'] =  $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
+                }
+            }
+
+            if (! empty($bccRecipients)) {
+                foreach ($bccRecipients as $recipient) {
+                    $talk['bcc'] =  $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
+                }
             }
 
             // Let's build DATA content.
 
             $talk['data'] =  $this->sendCmd('DATA', 354);
-
-            // transmit them only as a <CRLF> sequence.
-            $ln = "\r\n";
-
-            $to = '';
-            foreach ($toRecipients as $recipient) {
-                $to .= 'To: <' . $recipient['email'] . '>' . $ln;
-            }
-
-            $cc = '';
-            foreach ($ccRecipients as $recipient) {
-                $cc .= 'Cc: <' . $recipient['email'] . '>' . $ln;
-            }
-
-            // The default is iso-8859-1, but using UTF-8 instead.
-            $charset = 'utf-8';
-            $type = $this->getContentType($message);
-
-            $headers = '';
-            $headers .= $to;
-            $headers .= 'Subject: ' . $this->subject . $ln;
-            $headers .= 'From: <' . $this->sender['email'] . '>' . $ln;
-            $headers .= 'Reply-To: <' . $this->sender['email'] . '>' . $ln;
-            $headers .= 'Return-Path: ' . $this->sender['email'] . $ln;
-            $headers .= $cc;
-            $headers .= 'X-Mailer: Shieldon Messenger' . $ln;
-            $headers .= 'MIME-Version: 1.0' . $ln;  
-            $headers .= 'Content-type: ' . $type . '; charset=' . $charset . $ln;
-
-            $body = $headers . $message . $ln . '.' . $ln;
-
-            $talk['send'] = $this->sendCmd($body, 250);
+            $talk['send'] = $this->sendCmd($header . $message . "\r\n.\r\n", 250);
 
             $this->sendCmd('QUIT');
             fclose($this->smtp);
 
-        } else {
-
-            if ($this->debug) {
-                throw new RuntimeException('Error occurred when connecting to ' . $this->host . ' (#' . $errno . ' - ' . $errstr . ')');
-            }
         }
 
-        if (empty($talk) && $this->debug) {
-            throw new RuntimeException('PHP fsockopen() is not supported on your system.');
+        if ($this->debug) {
+            
+            if (! $this->smtp) {
+                throw new RuntimeException(
+                    'An error occurs when connecting to ' . $this->host .
+                    '(#' . $errno . ' - ' . $errstr . ')'
+                );
+            }
+    
+            if (empty($talk)) {
+                throw new RuntimeException(
+                    'Your system does not support PHP fsockopen() function.'
+                );
+            }
         }
 
         $this->resultData = $talk;
@@ -277,26 +262,29 @@ class Smtp extends AbstractMailer implements MessengerInterface
      * @param mixed $socket Object or false.
      * @param int   $answer Expected answer.
      *
-     * @return void
+     * @return string
      */
-    private function talk($socket, $answer)
+    private function talk($socket, $answer): string
     {
         $success = false;
 
         $responseBody = fgets($socket, 1024);
 
-        if ($this->debug && substr($responseBody, 3, 1) !== ' ' && !$responseBody) {
-            throw new RuntimeException('Unable to fetch expected response.');
-        }
- 
         if (! empty($responseBody) && substr($responseBody, 0, 3) === $answer) {
             $success = true;
         }
 
-        if ($this->debug && ! $success) {
-            throw new RuntimeException('Unable to send email.)');
+        if ($this->debug) {
+
+            if (! $responseBody || substr($responseBody, 3, 1) !== ' ') {
+                throw new RuntimeException('Unable to fetch expected response.');
+            }
+
+            if (! $success) {
+                throw new RuntimeException('Unable to send email.)');
+            }
         }
 
-        return $responseBody ?? 'Failed.';
+        return empty($responseBody) ? 'Failed.' : $responseBody;
     }
 }

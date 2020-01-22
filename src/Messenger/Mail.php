@@ -36,24 +36,26 @@ class Mail extends AbstractMailer implements MessengerInterface
      */
     public function send(string $message): void
     {
-        $contentType = $this->getContentType($message);
+        $this->type = $this->getContentType($message);
 
-        if ($contentType !== 'text/html') {
-            $message = wordwrap($message, 60);
+        if ($this->type !== 'text/html') {
+            $message = wordwrap($message, 70);
         }
 
-        $headers = 'MIME-Version: 1.0' . "\r\n";
-        $headers .= 'Content-type: ' . $contentType . '; charset=UTF-8' . "\r\n";
+        $header = $this->getHeader();
 
-        if (! empty($this->sender)) {
-            $headers = 'From: ' . $this->sender['name'] . ' <' .  $this->sender['email'] . '>' . "\r\n";
-        }
-  
-        $subject = $this->subject;
+        // Build the recipients' string, the formatting must comply with » RFC 2822
+        // For example:
+        // User <user@example.com>, Another User <anotheruser@example.com>
+        $recipientList = '';
 
         foreach($this->recipients as $recipient) {
-            @mail($recipient['email'], $subject, $message, $headers);
+            $recipientList .= $recipient['name'] . ' <' . $recipient['email'] . '>, ';
         }
+
+        $recipientList = rtrim($recipientList, ', ');
+
+        @mail($recipientList, $this->subject, $message, $header);
     }
 
     /**

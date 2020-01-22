@@ -17,7 +17,9 @@ Or, download it and include the Messenger autoloader.
 require 'Messenger/autoload.php';
 ```
 
-## Usage
+## Basic Usage
+
+Other than the Mailer classes, the only one public API is `send()`. The only thing you need to do is to assign the required data fields into constructor when initializing instance.
 
 ### Telegram
 
@@ -46,35 +48,6 @@ $line = new \Messenger\LineNotify($accessToken);
 $line->send('say something!');
 ```
 
-### SendGrid
-
-If you have SendGrid API key, you can also send messages via SendGrid easily.
-
-```php
-$apiKey = 'your_api_key';
-
-$sendgrid = new \Messenger\Sendgrid($apiKey);
-$sendgrid->addSender('example.sender@gmail.com');
-$sendgrid->addRecipient('example.recipient@gmail.com');
-$sendgrid->setSubject('Foo, bar.')
-
-$sendgrid->send('say something!');
-```
-
-### MailGun
-
-```php
-$apiKey = 'your_api_key';
-$domain = 'your_domain_name';
-
-$sendgrid = new \Messenger\Mailgun($apiKey, $domain);
-$sendgrid->addSender('example.sender@gmail.com');
-$sendgrid->addRecipient('example.recipient@gmail.com');
-$sendgrid->setSubject('Foo, bar.')
-
-$sendgrid->send('say something!');
-```
-
 ### RocketChat
 
 ```php
@@ -86,6 +59,19 @@ $channel = '#general';
 $rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $channel);
 $rocketChat->send('say something!');
 ```
+
+## Mailer
+
+Public API methods:
+
+- addTo
+- addCc
+- addBcc
+- addReplyTo
+- addRecipient
+- setRecipients
+- setSubject
+- setSender
 
 ### Mail
 
@@ -122,8 +108,8 @@ try {
 
     $result = $mail->printResult();
     
-    // For debugging purpose.
-    echo nl2br($result);
+    // For debugging purpose. See `Debug` section.
+    echo $result;
 
 } catch (Exception $e) {
     echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -131,17 +117,56 @@ try {
 
 ```
 
+### SendGrid
+
+If you have SendGrid API key, you can also send messages via SendGrid easily.
+
+```php
+$apiKey = 'your_api_key';
+
+$sendgrid = new \Messenger\Sendgrid($apiKey);
+$sendgrid->addSender('example.sender@gmail.com');
+$sendgrid->addRecipient('example.recipient@gmail.com');
+$sendgrid->setSubject('Foo, bar.')
+
+$sendgrid->send('say something!');
+```
+
+### MailGun
+
+```php
+$apiKey = 'your_api_key';
+$domain = 'your_domain_name';
+
+$sendgrid = new \Messenger\Mailgun($apiKey, $domain);
+$sendgrid->addSender('example.sender@gmail.com');
+$sendgrid->addRecipient('example.recipient@gmail.com');
+$sendgrid->setSubject('Foo, bar.')
+
+$sendgrid->send('say something!');
+```
+
+#### Debug
+
+If the email is sent successfully, the result will look like the text below:
+
+```
+connection: 220 smtp.gmail.com ESMTP a1sm47532637pfo.68 - gsmtp
+hello: 250 smtp.gmail.com at your service
+resource: 334 VXNlcm5hbWU6
+user: 334 UGFzc3dvcmQ6
+pass: 235 2.7.0 Accepted
+from: 250 2.1.0 OK a1sm47532637pfo.68 - gsmtp
+to: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
+cc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
+bcc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
+data: 354 Go ahead a1sm47532637pfo.68 - gsmtp
+send: 250 2.0.0 OK 1579716390 a1sm47532637pfo.68 - gsmtp
+```
+
 ### Gmail
 
 Extended from `Smtp`, a ready-to-use Gmail SMTP client.
-
-#### Note: 
-
-Google doesn't like people use their SMTP server to sending email by scripts, to make sure it can work without problems, you have to set the settings right:
-
-- Check your Google Accounts -> Access for less secure apps -> Turn on
-- Use your host where you use to send email with your Google account and confirm that you have trusted the device on.
-
 
 ```php
 
@@ -160,12 +185,21 @@ try {
     $result = $mail->printResult();
     
     // For debugging purpose.
-    echo nl2br($result);
+    echo $result;
 
 } catch (Exception $e) {
     echo 'Caught exception: ',  $e->getMessage(), "\n";
 }
 ```
+
+#### Note
+
+Google doesn't like people use their SMTP server to sending email by scripts, to make sure it can work without problems, you have to set the settings right:
+
+- Check your Google Accounts -> Access for less secure apps -> Turn on
+- Use your host where you use to send email with your Google account and confirm that you have trusted the device on.
+
+---
 
 ## Author
 

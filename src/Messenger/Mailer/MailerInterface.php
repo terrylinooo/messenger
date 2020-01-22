@@ -19,15 +19,6 @@ namespace Messenger\Mailer;
 interface MailerInterface
 {
     /**
-     * Set the sender's information of the email that your want to send.
-     *
-     * @param array $sender [name, email]
-     *
-     * @return void
-     */
-    public function setSender(array $sender): void;
-
-    /**
      * Add a sender's information by email only.
      *
      * @param string $email
@@ -47,15 +38,6 @@ interface MailerInterface
     public function setRecipients(array $recipients): void;
 
     /**
-     * Add a recipient's information by email only.
-     *
-     * @param string $email
-     *
-     * @return void
-     */
-    public function addRecipient(string $email): void;
-
-    /**
      * Set The subject of the email that you want to send.
      *
      * @param string $subject The subject text.
@@ -63,4 +45,45 @@ interface MailerInterface
      * @return void
      */
     public function setSubject(string $subject): void;
+
+    /**
+     * Add a recipient's information by email only.
+     *
+     * @param string $email
+     * @param string $name  (option)
+     * @param string $type  (option) to, cc, bcc
+     *
+     * @return void
+     */
+    public function addRecipient(string $email, string $name, string $type): void;
+
+    /**
+     * Add a recipient for carbon copy.
+     *
+     * @param string $email
+     * @param string $name  (option)
+     *
+     * @return void
+     */
+    public function addCc(string $email, string $name): void;
+
+    /**
+     * Add a recipient for blind carbon copy.
+     *
+     * @param string $email
+     * @param string $name  (option)
+     *
+     * @return void
+     */
+    public function addBcc(string $email, string $name): void;
+
+    /**
+     * Add a Reply-To email address.
+     *
+     * @param string $email
+     * @param string $name  (option)
+     *
+     * @return void
+     */
+    public function addReplyTo(string $email, string $name): void;
 }
