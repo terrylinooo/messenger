@@ -127,13 +127,13 @@ class Smtp extends AbstractMailer implements MessengerInterface
 
         // Let's talk to SMTP server.
         if ($this->smtp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
-
             $talk['connection'] = $this->talk($this->smtp, 220);
 
             // RFC 821 - 3.5
             // Open a transmission channel.
-    
             $talk['hello'] = $this->sendCmd('HELO ' . $_SERVER['SERVER_NAME'], 250);
+
+            // Start login process.
             $talk['resource'] = $this->sendCmd('AUTH LOGIN', 334);
 
             // Transmit the username to SMTP server.
@@ -142,21 +142,22 @@ class Smtp extends AbstractMailer implements MessengerInterface
             // Transmit the password to SMTP server.
             $talk['pass'] = $this->sendCmd(base64_encode($this->pass), 235);
 
+            // Specify this email is sent by whom.
             $talk['from'] = $this->sendCmd('MAIL FROM: <' . $this->sender['email'] . '>', 250);
-
-
 
             // Apply the recipient list.
             foreach($this->recipients as $i => $recipient) {
 
+                if ($recipient['type'] === 'to') {
+                    $toRecipients[$i] = $recipient['email'];
+                }
+
                 if ($recipient['type'] === 'cc') {
                     $ccRecipients[$i] = $recipient['email'];
-
-                } else if ($recipient['type'] === 'bcc') {
+                }
+                
+                if ($recipient['type'] === 'bcc') {
                     $bccRecipients[$i] = $recipient['email'];
-
-                } else {
-                    $toRecipients[$i] = $recipient['email'];
                 }
             }
 
@@ -179,13 +180,13 @@ class Smtp extends AbstractMailer implements MessengerInterface
             }
 
             // Let's build DATA content.
-
             $talk['data'] =  $this->sendCmd('DATA', 354);
+
+            // Send email.
             $talk['send'] = $this->sendCmd($header . $message . "\r\n.\r\n", 250);
 
             $this->sendCmd('QUIT');
             fclose($this->smtp);
-
         }
 
         if ($this->debug) {
