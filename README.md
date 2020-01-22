@@ -19,7 +19,12 @@ require 'Messenger/autoload.php';
 
 ## Basic Usage
 
+Public API methods:
+
+- send
+
 Other than the Mailer classes, the only one public API is `send()`. The only thing you need to do is to assign the required data fields into constructor when initializing instance.
+
 
 ### Telegram
 
@@ -60,10 +65,11 @@ $rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $chan
 $rocketChat->send('say something!');
 ```
 
-## Mailer
+## Mailer Usage
 
 Public API methods:
 
+- send
 - addTo
 - addCc
 - addBcc
@@ -117,6 +123,24 @@ try {
 
 ```
 
+#### Debug
+
+If the email is sent successfully, the result will look like the text below:
+
+```
+connection: 220 smtp.gmail.com ESMTP a1sm47532637pfo.68 - gsmtp
+hello: 250 smtp.gmail.com at your service
+resource: 334 VXNlcm5hbWU6
+user: 334 UGFzc3dvcmQ6
+pass: 235 2.7.0 Accepted
+from: 250 2.1.0 OK a1sm47532637pfo.68 - gsmtp
+to: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
+cc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
+bcc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
+data: 354 Go ahead a1sm47532637pfo.68 - gsmtp
+send: 250 2.0.0 OK 1579716390 a1sm47532637pfo.68 - gsmtp
+```
+
 ### SendGrid
 
 If you have SendGrid API key, you can also send messages via SendGrid easily.
@@ -144,24 +168,6 @@ $sendgrid->addRecipient('example.recipient@gmail.com');
 $sendgrid->setSubject('Foo, bar.')
 
 $sendgrid->send('say something!');
-```
-
-#### Debug
-
-If the email is sent successfully, the result will look like the text below:
-
-```
-connection: 220 smtp.gmail.com ESMTP a1sm47532637pfo.68 - gsmtp
-hello: 250 smtp.gmail.com at your service
-resource: 334 VXNlcm5hbWU6
-user: 334 UGFzc3dvcmQ6
-pass: 235 2.7.0 Accepted
-from: 250 2.1.0 OK a1sm47532637pfo.68 - gsmtp
-to: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
-cc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
-bcc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
-data: 354 Go ahead a1sm47532637pfo.68 - gsmtp
-send: 250 2.0.0 OK 1579716390 a1sm47532637pfo.68 - gsmtp
 ```
 
 ### Gmail
