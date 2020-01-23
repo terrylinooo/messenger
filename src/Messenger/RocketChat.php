@@ -106,7 +106,7 @@ class RocketChat implements MessengerInterface
             $result = json_decode($result, true);
 
             if ($result['success'] !== true) {
-                throw new RuntimeException('An error occurred when accessing RocketChat API. (' . $result['message']['msg'] . ')');
+                throw new RuntimeException('An error occurs when accessing RocketChat API. (' . $result['message']['msg'] . ')');
             }
         }
     }

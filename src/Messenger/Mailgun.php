@@ -84,7 +84,7 @@ class Mailgun extends AbstractMailer implements MessengerInterface
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if (curl_errno($ch) || $httpcode !== 200 || empty($result)) {
-             throw new RuntimeException('An error occurred when accessing Mailgun v3 API. (#' . $httpcode . ')');
+             throw new RuntimeException('An error occurs when accessing Mailgun v3 API. (#' . $httpcode . ')');
         }
         
         curl_close($ch);

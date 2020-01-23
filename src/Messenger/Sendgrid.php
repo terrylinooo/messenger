@@ -84,14 +84,14 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
             $result = json_decode($result, true);
 
             if (! empty($result['errors'][0]['message'])) {
-                throw new RuntimeException('An error occurred when accessing Sendgrid v3 API. (' . $result['errors'][0]['message'] . ')');
+                throw new RuntimeException('An error occurs when accessing Sendgrid v3 API. (' . $result['errors'][0]['message'] . ')');
             }
         }
 
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if (curl_errno($ch) || $httpcode !== 202) {
-            throw new RuntimeException('An error occurred when accessing Sendgrid v3 API. (#' . $httpcode . ')');
+            throw new RuntimeException('An error occurs when accessing Sendgrid v3 API. (#' . $httpcode . ')');
         }
 
         curl_close($ch);

@@ -76,7 +76,7 @@ class LineNotify implements MessengerInterface
             $result = json_decode($result, true);
 
             if (200 !== $result['status']) {
-                throw new RuntimeException('An error occurred when accessing Line Notify API. (' . $result['message'] . ')');
+                throw new RuntimeException('An error occurs when accessing Line Notify API. (' . $result['message'] . ')');
             }
         }
     }
