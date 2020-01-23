@@ -4,6 +4,19 @@ Sending messages to the third-party API services made easy for PHP.
 
 Shieldon Messenger is initially designed for a part of the Shieldon Firewall, sending notifications to webmasters or developers when their web applications are possibly under attacks. If you are looking for a web security library to protect your website, [Shieldon Firewall](https://github.com/terrylinooo/shieldon) might be a good choice for you.
 
+Supported modules:
+
+- Telegram
+- Line Notify
+- RocketChat
+- Slack (API)
+- Slack (Webhook)
+- Mail
+- Smtp
+- SendGrid
+- MailGun
+- Gmail
+
 ## Installation
 
 Use PHP Composer:
@@ -24,7 +37,6 @@ Public API methods:
 - send
 
 Other than the Mailer classes, the only one public API is `send()`. The only thing you need to do is to assign the required data fields into constructor when initializing instance.
-
 
 ### Telegram
 
@@ -75,7 +87,7 @@ Please clearfully read Slack's official API docs to find out things you need.
 
 This would be the simplest way for messaging.
 
-```
+```php
 $webhook = 'https://hooks.slack.com/services/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';
 
 $slack = new \Messenger\Slack($webhook);
@@ -90,14 +102,16 @@ $slack->send('Say something!');
 - Obtain bot's access token.
 - Add your App to the channel you would like to send messages.
 
-```
+```php
 $botToken = 'xoxb-551837935968-920623655894-TI1zWtaDLCkTzZaFFuyfzL56';
 $channel = '#general';
 
 $slack = new \Messenger\Slack($botToken, $channel);
 $slack->send('Say something!');
-
 ```
+
+ok.
+
 ---
 
 ## Mailer Usage
