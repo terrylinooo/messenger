@@ -65,6 +65,41 @@ $rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $chan
 $rocketChat->send('say something!');
 ```
 
+### Slack
+
+The first parameter of Slack class can be a Bot's access token or a webhook URL of channel. If you choose to use webhook, the second parameter can be ignored.
+
+Please clearfully read Slack's official API docs to find out things you need.
+
+#### Webhook:
+
+This would be the simplest way for messaging.
+
+```
+$webhook = 'https://hooks.slack.com/services/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';
+
+$slack = new \Messenger\Slack($webhook);
+$slack->send('Say something!');
+```
+
+#### API:
+
+- Create a App
+- Assign `channels:read` and `chat:write:bot` permissions to your App.
+- Assign your APP to your workspace.
+- Obtain bot's access token.
+- Add your App to the channel you would like to send messages.
+
+```
+$botToken = 'xoxb-551837935968-920623655894-TI1zWtaDLCkTzZaFFuyfzL56';
+$channel = '#general';
+
+$slack = new \Messenger\Slack($botToken, $channel);
+$slack->send('Say something!');
+
+```
+---
+
 ## Mailer Usage
 
 Public API methods:
