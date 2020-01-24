@@ -1,7 +1,7 @@
 {
     "name": "shieldon/messenger",
-    "description": "Sending messages to the third-party API services made easy for PHP.",
-    "keywords": ["messenger", "message", "mailer"],
+    "description": "Sending messages to the third-party services made easy for PHP.",
+    "keywords": ["messenger", "message", "mailer", "smtp"],
     "homepage": "https://github.com/terrylinooo/messenger",
     "license": "MIT",
     "authors": [

@@ -33,6 +33,8 @@ use function fclose;
  */
 class Smtp extends AbstractMailer implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * SMTP username.
      *
@@ -62,32 +64,11 @@ class Smtp extends AbstractMailer implements MessengerInterface
     private $port = 25;
 
     /**
-     * The connection result.
-     *
-     * @var array
-     */
-    private $resultData = [];
-
-    /**
      * Socket resource instance.
      *
      * @var resource
      */
     private $smtp;
-
-    /**
-     * Debug mode.
-     *
-     * @var bool
-     */
-    private $debug = false;
-
-    /**
-     * The connection timeout when calling SMTP server.
-     *
-     * @var int
-     */
-    private $timeout = 5;
 
     /**
      * @param string $user    The username that you want to use to login to SMTP server.
@@ -123,27 +104,31 @@ class Smtp extends AbstractMailer implements MessengerInterface
             $message = wordwrap($message, 70);
         }
 
+        if (empty($this->sender['email'])) {
+            $this->sender['email'] = $this->user;
+        }
+
         $header = $this->getHeader();
 
         // Let's talk to SMTP server.
         if ($this->smtp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
-            $talk['connection'] = $this->talk($this->smtp, 220);
+            $result['connection'] = $this->talk($this->smtp, 220);
 
             // RFC 821 - 3.5
             // Open a transmission channel.
-            $talk['hello'] = $this->sendCmd('HELO ' . $_SERVER['SERVER_NAME'], 250);
+            $result['hello'] = $this->sendCmd('HELO ' . $_SERVER['SERVER_NAME'], 250);
 
             // Start login process.
-            $talk['resource'] = $this->sendCmd('AUTH LOGIN', 334);
+            $result['auth_type'] = $this->sendCmd('AUTH LOGIN', 334);
 
             // Transmit the username to SMTP server.
-            $talk['user'] = $this->sendCmd(base64_encode($this->user), 334);
+            $result['user'] = $this->sendCmd(base64_encode($this->user), 334);
 
             // Transmit the password to SMTP server.
-            $talk['pass'] = $this->sendCmd(base64_encode($this->pass), 235);
+            $result['pass'] = $this->sendCmd(base64_encode($this->pass), 235);
 
             // Specify this email is sent by whom.
-            $talk['from'] = $this->sendCmd('MAIL FROM: <' . $this->sender['email'] . '>', 250);
+            $result['from'] = $this->sendCmd('MAIL FROM: <' . $this->sender['email'] . '>', 250);
 
             // Apply the recipient list.
             foreach($this->recipients as $i => $recipient) {
@@ -163,49 +148,60 @@ class Smtp extends AbstractMailer implements MessengerInterface
 
             if (! empty($toRecipients)) {
                 foreach ($toRecipients as $recipient) { 
-                    $talk['to'] = $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
+                    $result['to'] = $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
                 }
             }
 
             if (! empty($ccRecipients)) {
                 foreach ($ccRecipients as $recipient) {
-                    $talk['cc'] =  $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
+                    $result['cc'] =  $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
                 }
             }
 
             if (! empty($bccRecipients)) {
                 foreach ($bccRecipients as $recipient) {
-                    $talk['bcc'] =  $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
+                    $result['bcc'] =  $this->sendCmd('RCPT TO: <' . $recipient . '>', 250);
                 }
             }
 
             // Let's build DATA content.
-            $talk['data'] =  $this->sendCmd('DATA', 354);
+            $result['data'] =  $this->sendCmd('DATA', 354);
 
             // Send email.
-            $talk['send'] = $this->sendCmd($header . $message . "\r\n.\r\n", 250);
+            $result['send'] = $this->sendCmd($header . $message . "\r\n.\r\n", 250);
 
             $this->sendCmd('QUIT');
             fclose($this->smtp);
         }
 
-        if ($this->debug) {
-            
-            if (! $this->smtp) {
-                throw new RuntimeException(
-                    'An error occurs when connecting to ' . $this->host .
-                    '(#' . $errno . ' - ' . $errstr . ')'
-                );
-            }
-    
-            if (empty($talk)) {
-                throw new RuntimeException(
-                    'Your system does not support PHP fsockopen() function.'
-                );
+
+        $message = '';
+
+        if (! $this->smtp) {
+            $this->success = false;
+            $message = 'An error occurs when connecting to ' . $this->host . '(#' . $errno . ' - ' . $errstr . ')';
+            $result = [];
+
+            if ($this->isDebug()) {
+                throw new RuntimeException($message);
             }
         }
 
-        $this->resultData = $talk;
+        if (empty($talk)) {
+            $this->success = false;
+            $message = 'Your system does not support PHP fsockopen() function.';
+            $result = [];
+
+            if ($this->isDebug()) {
+                throw new RuntimeException($message);
+            }
+        }
+
+        $this->resultData = [
+            'success' => $this->success,
+            'message' => $message,
+            'result'  => $result,
+        ];
     }
 
     /**
@@ -214,32 +210,6 @@ class Smtp extends AbstractMailer implements MessengerInterface
     public function provider(): string
     {
         return '';
-    }
-
-    /**
-     * Print the connection result. (for debugging purpose)
-     *
-     * @return string
-     */
-    public function printResult()
-    {
-        $data = '';
-
-        foreach ($this->resultData as $key => $value) {
-            $data .= $key . ': ' . $value . "\n";
-        }
-
-        return $data;
-    }
-
-    /**
-     * Debug mode.
-     *
-     * @return void
-     */
-    public function debugMode(bool $mode = false)
-    {
-        $this->debug = $mode;
     }
 
     /**
@@ -267,25 +237,16 @@ class Smtp extends AbstractMailer implements MessengerInterface
      */
     private function talk($socket, $answer): string
     {
-        $success = false;
-
         $responseBody = fgets($socket, 1024);
 
-        if (! empty($responseBody) && substr($responseBody, 0, 3) === $answer) {
-            $success = true;
+        if (! empty($responseBody) && substr($responseBody, 0, 3) !== $answer) {
+            $this->success = false;
         }
 
-        if ($this->debug) {
-
-            if (! $responseBody || substr($responseBody, 3, 1) !== ' ') {
-                throw new RuntimeException('Unable to fetch expected response.');
-            }
-
-            if (! $success) {
-                throw new RuntimeException('Unable to send email.)');
-            }
+        if (! $responseBody || substr($responseBody, 3, 1) !== ' ') {
+            $this->success = false;
         }
 
-        return empty($responseBody) ? 'Failed.' : $responseBody;
+        return empty($responseBody) ? 'Unable to fetch expected response.' : $responseBody;
     }
 }
