@@ -177,17 +177,21 @@ try {
 If the email is sent successfully, the result will look like the text below:
 
 ```
-connection: 220 smtp.gmail.com ESMTP a1sm47532637pfo.68 - gsmtp
+success: true
+message: Email is sent.
+--- result ---
+connection: 220 smtp.gmail.com ESMTP x11sm6715821pfn.53 - gsmtp
 hello: 250 smtp.gmail.com at your service
-resource: 334 VXNlcm5hbWU6
+auth_type: 334 VXNlcm5hbWU6
 user: 334 UGFzc3dvcmQ6
 pass: 235 2.7.0 Accepted
-from: 250 2.1.0 OK a1sm47532637pfo.68 - gsmtp
-to: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
-cc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
-bcc: 250 2.1.5 OK a1sm47532637pfo.68 - gsmtp
-data: 354 Go ahead a1sm47532637pfo.68 - gsmtp
-send: 250 2.0.0 OK 1579716390 a1sm47532637pfo.68 - gsmtp
+from: 250 2.1.0 OK x11sm6715821pfn.53 - gsmtp
+to: 250 2.1.5 OK x11sm6715821pfn.53 - gsmtp
+cc: 250 2.1.5 OK x11sm6715821pfn.53 - gsmtp
+bcc: 250 2.1.5 OK x11sm6715821pfn.53 - gsmtp
+data: 354 Go ahead x11sm6715821pfn.53 - gsmtp
+send: 250 2.0.0 OK 1579887885 x11sm6715821pfn.53 - gsmtp
+quit: 221 2.0.0 closing connection x11sm6715821pfn.53 - gsmtp
 ```
 
 ### SendGrid

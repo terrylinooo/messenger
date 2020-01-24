@@ -16,7 +16,7 @@ namespace Messenger;
  * @author Terry L. <contact@terryl.in>
  * @since 1.0.0
  */
-Trait Messenger
+Trait MessengerTrait
 {
     /**
      * The connection timeout when conntecting a SMTP server or a third-party API service.
@@ -42,21 +42,37 @@ Trait Messenger
     /**
      * Print the connection result. (for debugging purpose)
      *
+     * @param string $resturnType
+     *
      * @return string
      */
-    public function printResult(): string
+    public function printResult(string $returnType = 'plaintext'): string
     {
         $data = '';
 
-        foreach ($this->resultData as $key => $value) {
-            $data .= $key . ': ' . $value . "\n";
-
-            if (is_array($value) && ! empty($value) && $key === 'result') {
-                $data .= '--- result ---' . "\n";
-                foreach ($value as $key2 => $value2) {
-                    $data .= $key2 . ': ' . $value2 . "\n";
+        switch ($returnType) {
+            case 'json':
+                $data = json_encode($this->resultData, JSON_PRETTY_PRINT);
+                break;
+            case 'plaintext':
+                foreach ($this->resultData as $key => $value) {
+                    if (is_array($value) && ! empty($value)) {
+                        $data .= '--- ' . $key . ' ---' . "\n";
+                        foreach ($value as $key2 => $value2) {
+                            if (is_bool($value2)) {
+                                $value2 = $value2 ? 'true' : 'false';
+                            }
+                            $data .= $key2 . ': ' . trim($value2) . "\n";
+                        }
+                    } else {
+                        if (is_bool($value)) {
+                            $value = $value ? 'true' : 'false';
+                        }
+                        $data .= $key . ': ' . trim($value) . "\n";
+                    }
                 }
-            }
+                break;
+            default:
         }
 
         return $data;

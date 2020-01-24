@@ -170,7 +170,9 @@ class Smtp extends AbstractMailer implements MessengerInterface
             // Send email.
             $result['send'] = $this->sendCmd($header . $message . "\r\n.\r\n", 250);
 
-            $this->sendCmd('QUIT');
+            // Sending process is complete.
+            $result['quit'] =  $this->sendCmd('QUIT', 221);
+
             fclose($this->smtp);
         }
 
@@ -187,7 +189,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
             }
         }
 
-        if (empty($talk)) {
+        if (empty($result)) {
             $this->success = false;
             $message = 'Your system does not support PHP fsockopen() function.';
             $result = [];
@@ -195,6 +197,10 @@ class Smtp extends AbstractMailer implements MessengerInterface
             if ($this->isDebug()) {
                 throw new RuntimeException($message);
             }
+        }
+
+        if ($this->success) {
+            $message = 'Email is sent.';
         }
 
         $this->resultData = [
@@ -239,7 +245,9 @@ class Smtp extends AbstractMailer implements MessengerInterface
     {
         $responseBody = fgets($socket, 1024);
 
-        if (! empty($responseBody) && substr($responseBody, 0, 3) !== $answer) {
+        $responseCode = (int) substr($responseBody, 0, 3);
+
+        if (! empty($responseBody) && $responseCode !== $answer) {
             $this->success = false;
         }
 
