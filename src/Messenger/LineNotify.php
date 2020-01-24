@@ -67,11 +67,20 @@ class LineNotify implements MessengerInterface
 
         $result = curl_exec($ch);
 
-        if (! curl_errno($ch)) {
-            $result = json_decode($result, true);
+        $ret = $this->executeCurl($ch);
+
+        if ($ret['success']) {
+
+            $result = json_decode($ret['result'], true);
 
             if (200 !== $result['status']) {
-                throw new RuntimeException('An error occurs when accessing Line Notify API. (' . $result['message'] . ')');
+                $this->resultData['success'] = false;
+                $this->resultData['message'] = 'An error occurs when connecting Line Notify API. (' . $result['message'] . ')';
+                $this->resultData['result'] = $result;
+
+                if ($this->isDebug()) {
+                    throw new RuntimeException($this->resultData['message']);
+                }
             }
         }
     }
