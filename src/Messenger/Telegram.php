@@ -27,6 +27,8 @@ use function json_decode;
  */
 class Telegram implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * API key.
      *
@@ -46,13 +48,6 @@ class Telegram implements MessengerInterface
      * @var string
      */
     private $channel;
-
-    /**
-     * The connection timeout when calling Telegram API.
-     *
-     * @var int
-     */
-    private $timeout = 5;
 
     /**
      * @param string $apiKey  Telegram bot access token provided by BotFather
@@ -83,13 +78,19 @@ class Telegram implements MessengerInterface
             'chat_id' => $this->channel,
         ]));
 
-        $result = curl_exec($ch);
+        $ret = $this->executeCurl($ch);
 
-        if (! curl_errno($ch)) {
-            $result = json_decode($result, true);
+        if ($ret['success']) {
+            $result = json_decode($ret['result'], true);
 
-            if (false === $result['ok']) {
-                throw new RuntimeException('An error occurred when accessing Telegram API. (' . $result['description'] . ')');
+            if (! $result['ok']) {
+                $this->resultData['success'] = false;
+                $this->resultData['message'] = 'An error occurs when connecting Telegram API. (' . $result['description'] . ')';
+                $this->resultData['result'] = $result;
+
+                if ($this->isDebug()) {
+                    throw new RuntimeException($this->resultData['message']);
+                }
             }
         }
     }

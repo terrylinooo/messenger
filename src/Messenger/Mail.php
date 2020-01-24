@@ -23,6 +23,8 @@ use function mail;
  */
 class Mail extends AbstractMailer implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * Constructor.
      */

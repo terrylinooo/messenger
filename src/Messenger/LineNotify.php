@@ -27,6 +27,8 @@ use function json_decode;
  */
 class LineNotify implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * This access token is obtained by clicking `Generate token` button
      * at https://notify-bot.line.me/my/
@@ -34,13 +36,6 @@ class LineNotify implements MessengerInterface
      * @var string
      */
     private $accessToken = '';
-
-    /**
-     * The connection timeout when calling Telegram API.
-     *
-     * @var int
-     */
-    private $timeout = 5;
 
     /**
      * @param string $accessToken The developer access token.

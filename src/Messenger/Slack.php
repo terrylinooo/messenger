@@ -32,6 +32,8 @@ use function json_decode;
  */
 class Slack implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * Your bot user's OAuth access token.
      *
@@ -52,13 +54,6 @@ class Slack implements MessengerInterface
      * @var string
      */
     private $channel = '';
-
-    /**
-     * The connection timeout when calling Telegram API.
-     *
-     * @var int
-     */
-    private $timeout = 5;
 
     /**
      * The type of way sending message to Slack.
@@ -176,6 +171,15 @@ class Slack implements MessengerInterface
         ]);
 
         $result = curl_exec($ch);
+
+        $ret = $this->executeCurl($ch);
+
+        if ($ret['success']) {
+            if ('ok' !== $ret['result']) {
+
+
+            }
+        }
 
         if (! curl_errno($ch)) {
            if ('ok' !== $result) {

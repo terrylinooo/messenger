@@ -32,19 +32,14 @@ use function json_encode;
  */
 class Sendgrid extends AbstractMailer implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * The API key that you have applied for from Sendgrid.
      *
      * @var string
      */
     private $apiKey = '';
-
-    /**
-     * The connection timeout when calling Telegram API.
-     *
-     * @var int
-     */
-    private $timeout = 5;
 
     /**
      * @param string $apiKey Your SendGrid API key.

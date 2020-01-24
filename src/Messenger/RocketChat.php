@@ -30,6 +30,8 @@ use function json_encode;
  */
 class RocketChat implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * The user's authorized token.
      *
@@ -57,13 +59,6 @@ class RocketChat implements MessengerInterface
      * @var string
      */
     private $channel = '#general';
-
-    /**
-     * The connection timeout when calling Telegram API.
-     *
-     * @var int
-     */
-    private $timeout = 5;
 
     /**
      * @param string $accessToken The user's authorized token.

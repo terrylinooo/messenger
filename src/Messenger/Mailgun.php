@@ -28,6 +28,8 @@ use function curl_setopt;
  */
 class Mailgun extends AbstractMailer implements MessengerInterface
 {
+    use MessengerTrait;
+
     /**
      * The API key that you have applied for from Mailgun.
      *
@@ -41,13 +43,6 @@ class Mailgun extends AbstractMailer implements MessengerInterface
      * @var string
      */
     private $domain = '';
-
-    /**
-     * The connection timeout when calling Telegram API.
-     *
-     * @var int
-     */
-    private $timeout = 5;
 
     /**
      * @param string $apiKey Your Mailgun API key.

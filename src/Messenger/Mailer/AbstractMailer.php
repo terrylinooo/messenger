@@ -63,6 +63,13 @@ abstract class AbstractMailer implements MailerInterface
     protected $charset = 'utf-8';
 
     /**
+     * Confirm that every step works as expected, if not, set this variable as false.
+     * 
+     * @var bool
+     */
+    protected $success = true;
+
+    /**
      * @inheritDoc
      */
     public function addSender(string $sender, string $name = ''): void
@@ -212,10 +219,10 @@ abstract class AbstractMailer implements MailerInterface
         $bccRecipients = [];
 
         if (empty($this->sender['email'])) {
-            $this->sender['email'] = $this->user;
+            throw new RuntimeException('The sender\'s email is required');
         }
 
-        if (empty($this->sender['email'])) {
+        if (empty($this->sender['name'])) {
             $this->sender['name'] = $this->getPrettyName($this->sender['email']);
         }
 
