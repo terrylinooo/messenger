@@ -23,9 +23,9 @@ interface MessengerInterface
      *
      * @param string $message The message body.
      * 
-     * @return void
+     * @return bool
      */
-    public function send(string $message): void;
+    public function send(string $message): bool;
 
     /**
      * API URL from the third-party service provider.

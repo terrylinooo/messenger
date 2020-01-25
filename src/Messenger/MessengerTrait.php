@@ -62,12 +62,14 @@ Trait MessengerTrait
                             if (is_bool($value2)) {
                                 $value2 = $value2 ? 'true' : 'false';
                             }
+                            $value2 = (string) $value2;
                             $data .= $key2 . ': ' . trim($value2) . "\n";
                         }
                     } else {
                         if (is_bool($value)) {
                             $value = $value ? 'true' : 'false';
                         }
+                        $value = (string) $value;
                         $data .= $key . ': ' . trim($value) . "\n";
                     }
                 }
@@ -101,11 +103,12 @@ Trait MessengerTrait
     /**
      * Excute CURL process and parse the result.
      * 
-     * @param resource CURL resource.
+     * @param resource $ch         CURL resource.
+     * @param bool     $allowEmpty Allow target returns empty string.
      *
      * @return array 
      */
-    protected function executeCurl($ch): array
+    protected function executeCurl($ch, $allowEmpty = false): array
     {
         $success = true; // bool
         $message = '';   // string
@@ -113,7 +116,7 @@ Trait MessengerTrait
 
         $data = curl_exec($ch);
 
-        if (! empty($data) && ! curl_error($ch)) {
+        if (! curl_error($ch)) {
             $success = true;
             $message = 'CURL has fetched data from target server successfully.';
             $result = $data;
@@ -125,16 +128,17 @@ Trait MessengerTrait
                 $message = 'CURL failed to fetch data. (error code #' . curl_error($ch) . ')';
             }
     
-            if ($data === '') {
+            if (empty($data) && ! $allowEmpty) {
                 $success = false;
                 $message = 'The target returned an empty string.';
             }
         }
 
         $this->resultData = [
-            'success' => $success,
-            'message' => $message,
-            'result'  => $result,
+            'success'  => $success,
+            'message'  => $message,
+            'result'   => $result,
+            'httpcode' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
         ];
 
         curl_close($ch);

@@ -8,13 +8,14 @@ Supported modules:
 
 - Telegram
 - Line Notify
-- RocketChat
-- Slack (API)
-- Slack (Webhook)
+- Rocket Chat
+- Slack
+- Slack Webhook
 - Mail
 - Smtp
 - SendGrid
 - MailGun
+- MailGun Smtp
 - Gmail
 
 ## Installation
@@ -49,12 +50,19 @@ $apiKey = 'your_api_key';
 $channel = '@your_channel';
 
 $telegram = new \Messenger\Telegram($apiKey, $channel);
-$telegram->send('say something!');
+
+$result = $telegram->send('say something!');
+
+if ($result) {
+    echo 'Message is sent.');
+} else {
+    echo 'Failed to send message.';
+}
 ```
 
 ### Line Notify
 
-The access token can be obtained by clicking `Generate token` button at https://notify-bot.line.me/my/
+The access token can be obtained by clicking `Generate token` button at this [signup page](https://notify-bot.line.me/my/).
 
 Once you have obtained your developer access token for the chat group you choose, please invite `Line Notify` bot join your group, then the following code will work expectedly.
 
@@ -62,10 +70,17 @@ Once you have obtained your developer access token for the chat group you choose
 $accessToken = 'your_access_token';
 
 $line = new \Messenger\LineNotify($accessToken);
-$line->send('say something!');
+
+$result = $line->send('say something!');
+
+if ($result) {
+    echo 'Message is sent.');
+} else {
+    echo 'Failed to send message.';
+}
 ```
 
-### RocketChat
+### Rocket Chat
 
 ```php
 $accessToken = 'your_auth_token';
@@ -74,27 +89,21 @@ $serverUrl = 'https://your_rocket_chat.com:3000';
 $channel = '#general';
 
 $rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $channel);
-$rocketChat->send('say something!');
+
+$result = $rocketChat->send('say something!');
+
+if ($result) {
+    echo 'Message is sent.');
+} else {
+    echo 'Failed to send message.';
+}
 ```
 
 ### Slack
 
-The first parameter of Slack class can be a Bot's access token or a webhook URL of channel. If you choose to use webhook, the second parameter can be ignored.
+Please clearfully read Slack's official [API docs](https://api.slack.com/messaging/sending) to find out things you need.
 
-Please clearfully read Slack's official API docs to find out things you need.
-
-#### Webhook:
-
-This would be the simplest way for messaging.
-
-```php
-$webhook = 'https://hooks.slack.com/services/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';
-
-$slack = new \Messenger\Slack($webhook);
-$slack->send('Say something!');
-```
-
-#### API:
+Guide:
 
 - Create a App
 - Assign `channels:read` and `chat:write:bot` permissions to your App.
@@ -107,7 +116,32 @@ $botToken = 'xoxb-551837935968-920623655894-TI1zWtaDLCkTzZaFFuyfzL56';
 $channel = '#general';
 
 $slack = new \Messenger\Slack($botToken, $channel);
-$slack->send('Say something!');
+
+$result = $slack->send('say something!');
+
+if ($result) {
+    echo 'Message is sent.');
+} else {
+    echo 'Failed to send message.';
+}
+```
+
+### Slack Webhook
+
+This would be the simplest way for messaging. Please clearfully read Slack's official [API docs](https://api.slack.com/messaging/webhooks) to find out things you need.
+
+```php
+$webhook = 'https://hooks.slack.com/services/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';
+
+$slack = new \Messenger\SlackWebhook($webhook);
+
+$result = $slack->send('say something!');
+
+if ($result) {
+    echo 'Message is sent.');
+} else {
+    echo 'Failed to send message.';
+}
 ```
 
 ok.
@@ -138,7 +172,13 @@ $mail->addSender('example.sender@gmail.com');
 $mail->addRecipient('example.recipient@gmail.com');
 $mail->setSubject('Foo, bar.')
 
-$mail->send('say something!');
+$result = $mail->send('say something!');
+
+if ($result) {
+    echo 'Email is sent.');
+} else {
+    echo 'Failed to send email.';
+}
 ```
 
 ### Smtp
@@ -158,13 +198,130 @@ $mail->addSender('email@your_domain.com');
 $mail->addRecipient('do-not-reply@gmail.com');
 $mail->setSubject('Foo, bar.');
 
+$result = $mail->send('say something!');
+
+if ($result) {
+    echo 'Email is sent.');
+} else {
+    echo 'Failed to send email.';
+}
+```
+
+### SendGrid
+
+If you have SendGrid API key, you can also send messages via SendGrid easily.
+
+```php
+$apiKey = 'your_api_key';
+
+$sendgrid = new \Messenger\Sendgrid($apiKey);
+$sendgrid->addSender('example.sender@gmail.com');
+$sendgrid->addRecipient('example.recipient@gmail.com');
+$sendgrid->setSubject('Foo, bar.')
+
+$result = $sendgrid->send('say something!');
+
+if ($result) {
+    echo 'Email is sent.');
+} else {
+    echo 'Failed to send email.';
+}
+```
+
+### MailGun
+
+```php
+$apiKey = 'your_api_key';
+$domain = 'your_domain_name';
+
+$maingun = new \Messenger\Mailgun($apiKey, $domain);
+$maingun->addSender('example.sender@gmail.com');
+$maingun->addRecipient('example.recipient@gmail.com');
+$maingun->setSubject('Foo, bar.')
+
+$result = $maingun->send('say something!');
+
+if ($result) {
+    echo 'Email is sent.');
+} else {
+    echo 'Failed to send email.';
+}
+```
+
+### MailGun Smtp
+
+Extended from `Smtp`, a ready-to-use MailGun SMTP client.
+
+```php
+$user = 'your@gmail.com';
+$pass = 'your_password';
+
+$maingun = new \Messenger\MailgunSmtp($user, $pass);
+$maingun->addSender('example.sender@gmail.com');
+$maingun->addRecipient('example.recipient@gmail.com');
+$maingun->setSubject('Foo, bar.')
+
+$result = $maingun->send('say something!');
+
+if ($result) {
+    echo 'Email is sent.');
+} else {
+    echo 'Failed to send email.';
+}
+```
+
+### Gmail
+
+Extended from `Smtp`, a ready-to-use Gmail SMTP client.
+
+```php
+
+$user = 'your@gmail.com';
+$pass = 'your_password';
+
+$gmail = new \Messenger\Gmail($user, $pass);
+
+$gmail->addSender('your@gmail.com');
+$gmail->addRecipient('test@gmail.com');
+$gmail->setSubject('Foo, bar.');
+
+$result = $gmail->send('say something!');
+
+if ($result) {
+    echo 'Email is sent.');
+} else {
+    echo 'Failed to send email.';
+}
+```
+
+Note:
+
+Google doesn't like people use their SMTP server to sending email by scripts, to make sure it can work without problems, you have to set the settings right:
+
+- Check your Google Accounts -> Access for less secure apps -> Turn on
+- Use your host where you use to send email with your Google account and confirm that you have trusted the device on.
+
+---
+
+## Debug
+
+### debugMode()
+
+If you would like to catch exceptions, you use turn `debugMode` on.
+
+For example:
+
+```php
+$mail = new \Messenger\Smtp($user, $pass, $host, $port);
+
+$mail->debugMode(true);
+
+$mail->addSender('email@your_domain.com');
+$mail->addRecipient('do-not-reply@gmail.com');
+$mail->setSubject('Foo, bar.');
+
 try {
     $mail->send('say something!');
-
-    $result = $mail->printResult();
-    
-    // For debugging purpose. See `Debug` section.
-    echo $result;
 
 } catch (Exception $e) {
     echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -172,7 +329,21 @@ try {
 
 ```
 
-#### Debug
+### printResult()
+
+If you would like to print the executed results, you can use `printResult()`.
+
+For example:
+
+```php
+$mail = new \Messenger\Smtp($user, $pass, $host, $port);
+$mail->addSender('email@your_domain.com');
+$mail->addRecipient('do-not-reply@gmail.com');
+$mail->setSubject('Foo, bar.');
+$mail->send('say something!');
+
+echo $mail->printResult();
+```
 
 If the email is sent successfully, the result will look like the text below:
 
@@ -193,70 +364,6 @@ data: 354 Go ahead x11sm6715821pfn.53 - gsmtp
 send: 250 2.0.0 OK 1579887885 x11sm6715821pfn.53 - gsmtp
 quit: 221 2.0.0 closing connection x11sm6715821pfn.53 - gsmtp
 ```
-
-### SendGrid
-
-If you have SendGrid API key, you can also send messages via SendGrid easily.
-
-```php
-$apiKey = 'your_api_key';
-
-$sendgrid = new \Messenger\Sendgrid($apiKey);
-$sendgrid->addSender('example.sender@gmail.com');
-$sendgrid->addRecipient('example.recipient@gmail.com');
-$sendgrid->setSubject('Foo, bar.')
-
-$sendgrid->send('say something!');
-```
-
-### MailGun
-
-```php
-$apiKey = 'your_api_key';
-$domain = 'your_domain_name';
-
-$sendgrid = new \Messenger\Mailgun($apiKey, $domain);
-$sendgrid->addSender('example.sender@gmail.com');
-$sendgrid->addRecipient('example.recipient@gmail.com');
-$sendgrid->setSubject('Foo, bar.')
-
-$sendgrid->send('say something!');
-```
-
-### Gmail
-
-Extended from `Smtp`, a ready-to-use Gmail SMTP client.
-
-```php
-
-$user = 'your@gmail.com';
-$pass = 'your_password';
-
-$gmail = new \Messenger\Gmail($user, $pass);
-
-$gmail->addSender('your@gmail.com');
-$gmail->addRecipient('test@gmail.com');
-$gmail->setSubject('Foo, bar.');
-
-try {
-    $mail->send('say something!');
-
-    $result = $mail->printResult();
-    
-    // For debugging purpose.
-    echo $result;
-
-} catch (Exception $e) {
-    echo 'Caught exception: ',  $e->getMessage(), "\n";
-}
-```
-
-#### Note
-
-Google doesn't like people use their SMTP server to sending email by scripts, to make sure it can work without problems, you have to set the settings right:
-
-- Check your Google Accounts -> Access for less secure apps -> Turn on
-- Use your host where you use to send email with your Google account and confirm that you have trusted the device on.
 
 ---
 

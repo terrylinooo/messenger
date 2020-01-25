@@ -36,7 +36,7 @@ class Mail extends AbstractMailer implements MessengerInterface
     /**
      * @inheritDoc
      */
-    public function send(string $message): void
+    public function send(string $message): bool
     {
         $this->type = $this->getContentType($message);
 
@@ -57,7 +57,20 @@ class Mail extends AbstractMailer implements MessengerInterface
 
         $recipientList = rtrim($recipientList, ', ');
 
-        @mail($recipientList, $this->subject, $message, $header);
+        $this->success = @mail($recipientList, $this->subject, $message, $header);
+
+        // If there is no error, we assume the email that it is sent.
+        if ($this->success) {
+            $message = 'Email is sent.';
+        }
+
+        $this->resultData = [
+            'success' => $this->success,
+            'message' => $message,
+            'result'  => '',
+        ];
+
+        return $this->success;
     }
 
     /**

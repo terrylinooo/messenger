@@ -64,7 +64,7 @@ class Telegram implements MessengerInterface
     /**
      * @inheritDoc
      */
-    public function send(string $message): void
+    public function send(string $message): bool
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
@@ -91,8 +91,14 @@ class Telegram implements MessengerInterface
                 if ($this->isDebug()) {
                     throw new RuntimeException($this->resultData['message']);
                 }
+
+                return false;
             }
+
+            return true;
         }
+
+        return false;
     }
 
     /**

@@ -15,9 +15,6 @@ use Messenger\MessengerInterface;
 use RuntimeException;
 use stdClass;
 
-use function curl_close;
-use function curl_errno;
-use function curl_exec;
 use function curl_init;
 use function curl_setopt;
 use function json_encode;
@@ -54,7 +51,7 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
     /**
      * @inheritDoc
      */
-    public function send(string $message): void
+    public function send(string $message): bool
     {
         $message = $this->prepare($message);
 
@@ -73,23 +70,38 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
             'Content-Length: ' . strlen($message)
         ]);
 
-        $result = curl_exec($ch);
+        $ret = $this->executeCurl($ch, true);
 
-        if (! empty($result)) {
-            $result = json_decode($result, true);
+        if ($ret['success']) {
+
+            $result = json_decode($ret['result'], true);
 
             if (! empty($result['errors'][0]['message'])) {
-                throw new RuntimeException('An error occurs when accessing Sendgrid v3 API. (' . $result['errors'][0]['message'] . ')');
+                $this->resultData['success'] = false;
+                $this->resultData['message'] = $result['errors'][0]['message'];
+
+                if ($this->isDebug()) {
+                    throw new RuntimeException($this->resultData['message']);
+                }
+
+                return false;
             }
+ 
+            if (202 !== $ret['httpcode']) {
+                $this->resultData['success'] = false;
+                $this->resultData['message'] = 'An error occurs when connecting SendGrid v3 API. (#' . $ret['httpcode'] . ')';
+
+                if ($this->isDebug()) {
+                    throw new RuntimeException($this->resultData['message']);
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if (curl_errno($ch) || $httpcode !== 202) {
-            throw new RuntimeException('An error occurs when accessing Sendgrid v3 API. (#' . $httpcode . ')');
-        }
-
-        curl_close($ch);
+        return false;
     }
 
     /**

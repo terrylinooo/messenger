@@ -59,7 +59,7 @@ class Mailgun extends AbstractMailer implements MessengerInterface
     /**
      * @inheritDoc
      */
-    public function send(string $message): void
+    public function send(string $message): bool
     {
         $message = $this->prepare($message);
 
@@ -74,15 +74,25 @@ class Mailgun extends AbstractMailer implements MessengerInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_USERPWD, 'api:'. $this->apiKey);
 
-        $result = curl_exec($ch);
+        $ret = $this->executeCurl($ch);
 
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($ret['success']) {
+ 
+            if (200 !== $ret['httpcode']) {
+                $this->resultData['success'] = false;
+                $this->resultData['message'] = 'An error occurs when accessing MailGun v3 API. (#' . $ret['httpcode'] . ')';
 
-        if (curl_errno($ch) || $httpcode !== 200 || empty($result)) {
-             throw new RuntimeException('An error occurs when accessing Mailgun v3 API. (#' . $httpcode . ')');
+                if ($this->isDebug()) {
+                    throw new RuntimeException($this->resultData['message']);
+                }
+
+                return false;
+            }
+
+            return true;
         }
-        
-        curl_close($ch);
+
+        return false;
     }
 
     /**

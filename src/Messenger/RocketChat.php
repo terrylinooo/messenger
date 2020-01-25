@@ -79,7 +79,7 @@ class RocketChat implements MessengerInterface
     /**
      * @inheritDoc
      */
-    public function send(string $message): void
+    public function send(string $message): bool
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
@@ -95,15 +95,27 @@ class RocketChat implements MessengerInterface
             'X-Auth-Token: ' . $this->accessToken,
         ]);
 
-        $result = curl_exec($ch);
+        $ret = $this->executeCurl($ch);
 
-        if (! curl_errno($ch)) {
-            $result = json_decode($result, true);
+        if ($ret['success']) {
+            $result = json_decode($ret['result'], true);
 
-            if ($result['success'] !== true) {
-                throw new RuntimeException('An error occurs when accessing RocketChat API. (' . $result['message']['msg'] . ')');
+            if (! $result['success']) {
+                $this->resultData['success'] = false;
+                $this->resultData['message'] = $result['message']['msg'] ?? 'An error occurs when connecting RocketChat API.';
+                $this->resultData['result'] = $result;
+
+                if ($this->isDebug()) {
+                    throw new RuntimeException($this->resultData['message']);
+                }
+
+                return false;
             }
+
+            return true;
         }
+
+        return false;
     }
 
     /**

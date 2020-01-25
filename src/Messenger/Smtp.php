@@ -96,7 +96,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
      *
      * @return void
      */
-    public function send(string $message): void
+    public function send(string $message): bool
     {
         $this->type = $this->getContentType($message);
 
@@ -176,9 +176,9 @@ class Smtp extends AbstractMailer implements MessengerInterface
             fclose($this->smtp);
         }
 
-
         $message = '';
 
+        // error 1
         if (! $this->smtp) {
             $this->success = false;
             $message = 'An error occurs when connecting to ' . $this->host . '(#' . $errno . ' - ' . $errstr . ')';
@@ -189,6 +189,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
             }
         }
 
+        // error 2
         if (empty($result)) {
             $this->success = false;
             $message = 'Your system does not support PHP fsockopen() function.';
@@ -199,6 +200,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
             }
         }
 
+        // If there is no error, we assume the email that it is sent.
         if ($this->success) {
             $message = 'Email is sent.';
         }
@@ -208,6 +210,8 @@ class Smtp extends AbstractMailer implements MessengerInterface
             'message' => $message,
             'result'  => $result,
         ];
+
+        return $this->success;
     }
 
     /**

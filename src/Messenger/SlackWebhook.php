@@ -25,21 +25,14 @@ use function json_decode;
  * 
  * Sending messages to your Slack channel by using webhook. It is the simplest way to achieve it.
  * 
- * @see https://api.slack.com/messaging/sending
- *
+ * @see https://api.slack.com/messaging/webhooks
+ *      
  * @author Terry L. <contact@terryl.in>
  * @since 1.0.0
  */
-class Slack implements MessengerInterface
+class SlackWebhook implements MessengerInterface
 {
     use MessengerTrait;
-
-    /**
-     * Your bot user's OAuth access token.
-     *
-     * @var string
-     */
-    private $accessToken = '';
 
     /**
      * The webhook URL for your Slack channel.
@@ -49,41 +42,41 @@ class Slack implements MessengerInterface
     private $webhook = '';
 
     /**
-     * Your channel. (Not required for using webhook.)
-     *
-     * @var string
+     * @param string $webhook The webhook of your Slack workspace's channel.
+     * @param int    $timeout After n seconds the connection will be stopped.
      */
-    private $channel = '';
-
-    /**
-     * @param string $accessToken Your Slack bot's access token.
-     * @param string $channel     A channel of your Slack workspace.
-     * @param int    $timeout     After n seconds the connection will be stopped.
-     */
-    public function __construct(string $accessToken, string $channel, int $timeout = 5)
+    public function __construct(string $webhook, int $timeout = 5)
     {
-        $this->accessToken = $accessToken;
-        $this->channel = $channel;
+        $this->webhook = $webhook;
         $this->timeout = $timeout;
     }
 
     /**
      * @inheritDoc
-     * 
-     * Send messages to your Slack channel via Slack API.
-     * API Doc: https://api.slack.com/methods/chat.postMessage
      */
     public function send(string $message): bool
     {
+        if (strpos($this->webhook, $this->provider()) === false) {
+            $this->resultData['success'] = false;
+            $this->resultData['message'] = 'Webhook URL is invalid.';
+            $this->resultData['result'] = $this->webhook;
+    
+            if ($this->isDebug()) {
+                throw new RuntimeException($this->resultData['message']);
+            }
+
+            return false;
+        }
+
         // Prepare data.
         $data = new stdClass();
-        $data->channel = $this->channel;
         $data->text = $message;
 
         $message = json_encode($data);
 
+        // Start transmit data to Slack.
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->provider());
+        curl_setopt($ch, CURLOPT_URL, $this->webhook);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $message);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -92,18 +85,16 @@ class Slack implements MessengerInterface
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-type: '  . 'application/json',
-            'Authorization: ' . 'Bearer ' . $this->accessToken,
+            'Content-Length: ' . strlen($message),
         ]);
 
         $ret = $this->executeCurl($ch);
 
         if ($ret['success']) {
 
-            $result = json_decode($ret['result'], true);
-
-            if (! isset($result['ok']) || ! $result['ok']) {
+            if ('ok' !== $ret['result']) {
                 $this->resultData['success'] = false;
-                $this->resultData['message'] = 'An error occurrs when connecting Slack.';
+                $this->resultData['message'] = 'An error occurrs when connecting Slack via webhook.';
 
                 if ($this->isDebug()) {
                     throw new RuntimeException($this->resultData['message']);
@@ -119,12 +110,10 @@ class Slack implements MessengerInterface
     }
 
     /**
-     * For API only.
-     *
      * @inheritDoc
      */
     public function provider(): string
     {
-        return 'https://slack.com/api/chat.postMessage';
+        return 'https://hooks.slack.com';
     }
 }
