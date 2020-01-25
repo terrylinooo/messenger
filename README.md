@@ -15,6 +15,7 @@ Sending messages to the third-party services made easy for PHP.
 - MailGun
 - MailGun SMTP
 - Gmail
+- Yahoo Mail
 
 More modules will come in the future...
 
@@ -290,6 +291,30 @@ $gmail->addRecipient('test@gmail.com');
 $gmail->setSubject('Foo, bar.');
 
 $result = $gmail->send('say something!');
+
+if ($result) {
+    echo 'Email is sent.');
+} else {
+    echo 'Failed to send email.';
+}
+```
+
+### Yahoo Mail
+
+Extended from `Smtp`, a ready-to-use Yahoo SMTP client.
+
+```php
+
+$user = 'your@gmail.com';
+$pass = 'your_password';
+
+$yahooMail = new \Messenger\YahooMail($user, $pass);
+
+$yahooMail->addSender('your@yahoo.com');
+$yahooMail->addRecipient('test@gmail.com');
+$yahooMail->setSubject('Foo, bar.');
+
+$result = $yahooMail->send('say something!');
 
 if ($result) {
     echo 'Email is sent.');
