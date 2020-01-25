@@ -2,7 +2,7 @@
 
 Sending messages to the third-party services made easy for PHP.
 
-Supported modules:
+*Supported modules:*
 
 - Telegram
 - Line Notify
@@ -10,11 +10,13 @@ Supported modules:
 - Slack
 - Slack Webhook
 - Mail
-- Smtp
+- SMTP
 - SendGrid
 - MailGun
-- MailGun Smtp
+- MailGun SMTP
 - Gmail
+
+More modules will come in the future...
 
 ## Installation
 
@@ -34,6 +36,8 @@ require 'Messenger/autoload.php';
 Public API methods:
 
 - send
+- debugMode
+- printResult
 
 Other than the Mailer classes, the only one public API is `send()`. The only thing you need to do is to assign the required data fields into constructor when initializing instance.
 
@@ -159,6 +163,8 @@ Public API methods:
 - setRecipients
 - setSubject
 - setSender
+- debugMode
+- printResult
 
 ### Mail
 
@@ -179,7 +185,7 @@ if ($result) {
 }
 ```
 
-### Smtp
+### SMTP
 
 A very simple SMTP client.
 
@@ -246,7 +252,7 @@ if ($result) {
 }
 ```
 
-### MailGun Smtp
+### MailGun SMTP
 
 Extended from `Smtp`, a ready-to-use MailGun SMTP client.
 
@@ -369,7 +375,7 @@ quit: 221 2.0.0 closing connection x11sm6715821pfn.53 - gsmtp
 
 Messenger library is brought to you by [Terry L.](https://terryl.in) from Taiwan.
 
-Shieldon Messenger is initially designed for a part of the Shieldon Firewall, sending notifications to webmasters or developers when their web applications are possibly under attacks. If you are looking for a web security library to protect your website, Shieldon [Firewall](https://github.com/terrylinooo/shieldon) might be a good choice for you.
+Shieldon Messenger is initially designed for a part of the [Shieldon Firewall](https://github.com/terrylinooo/shieldon), sending notifications to webmasters or developers when their web applications are possibly under attacks. If you are looking for a web security library to protect your website, Shieldon [Firewall](https://shieldon.io) might be a good choice for you.
 
 ## License
 
