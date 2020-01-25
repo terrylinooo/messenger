@@ -1,8 +1,6 @@
 # Messenger
 
-Sending messages to the third-party API services made easy for PHP.
-
-Shieldon Messenger is initially designed for a part of the Shieldon Firewall, sending notifications to webmasters or developers when their web applications are possibly under attacks. If you are looking for a web security library to protect your website, [Shieldon Firewall](https://github.com/terrylinooo/shieldon) might be a good choice for you.
+Sending messages to the third-party services made easy for PHP.
 
 Supported modules:
 
@@ -370,6 +368,8 @@ quit: 221 2.0.0 closing connection x11sm6715821pfn.53 - gsmtp
 ## Author
 
 Messenger library is brought to you by [Terry L.](https://terryl.in) from Taiwan.
+
+Shieldon Messenger is initially designed for a part of the Shieldon Firewall, sending notifications to webmasters or developers when their web applications are possibly under attacks. If you are looking for a web security library to protect your website, Shieldon [Firewall](https://github.com/terrylinooo/shieldon) might be a good choice for you.
 
 ## License
 
