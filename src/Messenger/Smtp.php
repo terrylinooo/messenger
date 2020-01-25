@@ -248,8 +248,11 @@ class Smtp extends AbstractMailer implements MessengerInterface
     private function talk($socket, $answer): string
     {
         $responseBody = fgets($socket, 1024);
+        $responseCode = 0;
 
-        $responseCode = (int) substr($responseBody, 0, 3);
+        if (is_string($responseBody)) {
+            $responseCode = (int) substr($responseBody, 0, 3);
+        }
 
         if (! empty($responseBody) && $responseCode !== $answer) {
             $this->success = false;

@@ -65,8 +65,6 @@ class LineNotify implements MessengerInterface
             'Authorization: ' . 'Bearer ' . $this->accessToken,
         ]);
 
-        $result = curl_exec($ch);
-
         $ret = $this->executeCurl($ch);
 
         if ($ret['success']) {
