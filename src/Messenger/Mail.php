@@ -14,6 +14,8 @@ use Messenger\Mailer\AbstractMailer;
 use Messenger\MessengerInterface;
 
 use function mail;
+use function wordwrap;
+use function rtrim;
 
 /**
  * Send message by PHP's bulit-in mail() function.

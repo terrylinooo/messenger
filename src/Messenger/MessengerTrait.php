@@ -10,6 +10,14 @@
 
 namespace Messenger;
 
+use function is_array;
+use function is_bool;
+use function json_encode;
+use function curl_exec;
+use function curl_error;
+use function curl_close;
+use function curl_getinfo;
+
 /**
  * Messenger Interface
  *
@@ -68,6 +76,9 @@ Trait MessengerTrait
                     } else {
                         if (is_bool($value)) {
                             $value = $value ? 'true' : 'false';
+                        }
+                        if (empty($value)) {
+                            $value = '';
                         }
                         $value = (string) $value;
                         $data .= $key . ': ' . trim($value) . "\n";

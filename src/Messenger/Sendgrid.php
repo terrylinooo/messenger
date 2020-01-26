@@ -18,6 +18,7 @@ use stdClass;
 use function curl_init;
 use function curl_setopt;
 use function json_encode;
+use function strlen;
 
 /**
  * Send message through Sendgrid API.

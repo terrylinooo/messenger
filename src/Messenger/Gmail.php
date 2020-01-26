@@ -34,10 +34,25 @@ class Gmail extends Smtp implements MessengerInterface
     /**
      * @param string $user    The username that you want to use to login to SMTP server.
      * @param string $pass    The password of that user.
+     * @param string $type    ssl|tls - SSL or TLS protocol.
      * @param int    $timeout After n seconds the connection will be stopped.
      */
-    public function __construct(string $user, string $pass, int $timeout = 5)
+    public function __construct(string $user, string $pass, string $type = 'ssl', int $timeout = 5)
     {
-        parent::__construct($user, $pass, 'ssl://smtp.gmail.com', 465, $timeout);
+        if ($type === 'tls') {
+            $host = 'smtp.gmail.com';
+            $port = 587;
+            $this->encryptionType = 'tls';
+        }
+
+        if ($type === 'ssl') {
+            $host= 'ssl://smtp.gmail.com';
+            $port = 465;
+            $this->encryptionType = 'ssl';
+        }
+
+        if ($this->encryptionType !== '') {
+            parent::__construct($user, $pass, $host, $port, $timeout);
+        }
     }
 }

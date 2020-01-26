@@ -13,8 +13,6 @@ namespace Messenger;
 use Messenger\MessengerInterface;
 use RuntimeException;
 
-use function curl_errno;
-use function curl_exec;
 use function curl_init;
 use function curl_setopt;
 use function json_decode;

@@ -14,9 +14,6 @@ use Messenger\Mailer\AbstractMailer;
 use Messenger\MessengerInterface;
 use RuntimeException;
 
-use function curl_close;
-use function curl_errno;
-use function curl_exec;
 use function curl_init;
 use function curl_setopt;
 

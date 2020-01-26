@@ -14,10 +14,16 @@ use Messenger\Mailer\AbstractMailer;
 use Messenger\MessengerInterface;
 use RuntimeException;
 
-use function fsockopen;
-use function fputs;
-use function fgets;
+use function base64_encode;
 use function fclose;
+use function fgets;
+use function fputs;
+use function fsockopen;
+use function restore_error_handler;
+use function set_error_handler;
+use function stream_socket_client;
+use function stream_socket_enable_crypto;
+use function wordwrap;
 
 /**
  * A very simple SMTP client.
@@ -62,6 +68,15 @@ class Smtp extends AbstractMailer implements MessengerInterface
      * @var int
      */
     private $port = 25;
+
+
+    /**
+     * The encryption of connecting to SMTP server.
+     * tls (STARTTLS), ssl (SMTPS), empty string (SMTP)
+     *
+     * @var string
+     */
+    protected $encryptionType = '';
 
     /**
      * Socket resource instance.
@@ -110,13 +125,53 @@ class Smtp extends AbstractMailer implements MessengerInterface
 
         $header = $this->getHeader();
 
+        if (substr($this->host, 0, 3) == 'tls') {
+            $this->host = str_replace('tls://', '', $this->host);
+            $this->encryptionType = 'tls';
+        }
+
         // Let's talk to SMTP server.
-        if ($this->smtp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
+        if (function_exists('stream_socket_client')) {
+            $this->smtp = stream_socket_client($this->host . ':' . $this->port, $errno, $errstr, $this->timeout);
+
+        // `stream_socket_client` is missing? Let's try `fsockopen`;
+        } elseif (function_exists('fsockopen')) {
+            $this->smtp = fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout);
+
+        // We cannot use SMTP because of the following reason...
+        } else {
+            $this->showError('PHP functons stream_socket_client and fsockopen are missing or disabled. One of them is required.');
+            return false;
+        }
+
+        if ($this->smtp) {
+
             $result['connection'] = $this->talk($this->smtp, 220);
 
             // RFC 821 - 3.5
             // Open a transmission channel.
             $result['hello'] = $this->sendCmd('HELO ' . $_SERVER['SERVER_NAME'], 250);
+
+            // Start TLS conntection.
+            if ('tls' === $this->encryptionType) {
+
+                $result['tls'] = $this->sendCmd('STARTTLS', 220);
+
+                $cryptoMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+
+                if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
+                    $cryptoMethod |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+                    $cryptoMethod |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+                }
+
+                set_error_handler([$this, 'errorHandler']);
+                $resultCrypto = stream_socket_enable_crypto($this->smtp, true, $cryptoMethod);
+                restore_error_handler();
+
+                if (! $resultCrypto) {
+                    return false;
+                }
+            }
 
             // Start login process.
             $result['auth_type'] = $this->sendCmd('AUTH LOGIN', 334);
@@ -126,6 +181,9 @@ class Smtp extends AbstractMailer implements MessengerInterface
 
             // Transmit the password to SMTP server.
             $result['pass'] = $this->sendCmd(base64_encode($this->pass), 235);
+        
+            //$result['auth_type'] = $this->sendCmd('AUTH PLAIN', 334);
+            //$result['user_pass'] = $this->sendCmd(base64_encode("\0" . $this->user . "\0" . $this->pass), 235);
 
             // Specify this email is sent by whom.
             $result['from'] = $this->sendCmd('MAIL FROM: <' . $this->sender['email'] . '>', 250);
@@ -176,31 +234,13 @@ class Smtp extends AbstractMailer implements MessengerInterface
             fclose($this->smtp);
         }
 
-        $message = '';
-
-        // error 1
         if (! $this->smtp) {
-            $this->success = false;
-            $message = 'An error occurs when connecting to ' . $this->host . '(#' . $errno . ' - ' . $errstr . ')';
-            $result = [];
-
-            if ($this->isDebug()) {
-                throw new RuntimeException($message);
-            }
-        }
-
-        // error 2
-        if (empty($result)) {
-            $this->success = false;
-            $message = 'Your system does not support PHP fsockopen() function.';
-            $result = [];
-
-            if ($this->isDebug()) {
-                throw new RuntimeException($message);
-            }
+            $this->showError('An error occurs when connecting to ' . $this->host . '(#' . $errno . ' - ' . $errstr . ')');
         }
 
         // If there is no error, we assume the email that it is sent.
+        $message = '';
+
         if ($this->success) {
             $message = 'Email is sent.';
         }
@@ -263,5 +303,45 @@ class Smtp extends AbstractMailer implements MessengerInterface
         }
 
         return empty($responseBody) ? 'Unable to fetch expected response.' : $responseBody;
+    }
+
+    /**
+     * Custom PHP error handler.
+     *
+     * @param int    $no      Error number.
+     * @param string $message Error message.
+     * @param string $file    Which file that error occurred in.
+     * @param int    $line    The line number of the file that error occurred at.
+     * 
+     * @return void
+     */
+    protected function errorHandler(int $no, string $message, string $file = '', int $line = 0): void
+    {
+        $this->success = false;
+
+        $this->resultData = [
+            'success' => false,
+            'message' => $message,
+            'result'  => $no,
+        ];
+
+        if ($this->isDebug()) {
+            throw new RuntimeException(
+                'Connection failed. (' . $no . ':' . $message . ') (file: ' . $file . ' line: ' .  $line . ')'
+            );
+        }
+    }
+
+    /**
+     * Simply use errorHandler.
+     *
+     * @param string $message Error message.
+     * @param int    $no      Error number.
+     *
+     * @return void
+     */
+    protected function showError(string $message, int $no = 0): void
+    {
+        $this->errorHandler($no, $message);
     }
 }
