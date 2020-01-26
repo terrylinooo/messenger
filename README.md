@@ -305,7 +305,7 @@ Extended from `Smtp`, a ready-to-use Yahoo SMTP client.
 
 ```php
 
-$user = 'your@gmail.com';
+$user = 'your@yahoo.com';
 $pass = 'your_password';
 
 $yahooMail = new \Messenger\YahooMail($user, $pass);

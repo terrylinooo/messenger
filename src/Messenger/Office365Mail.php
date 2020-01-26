@@ -18,7 +18,7 @@ use Messenger\MessengerInterface;
  * @author Terry L. <contact@terryl.in>
  * @since 1.3.0
  */
-class OutlookMail extends Smtp implements MessengerInterface
+class Office365Mail extends Smtp implements MessengerInterface
 {
     /**
      * @param string $user    The username that you want to use to login to SMTP server.
