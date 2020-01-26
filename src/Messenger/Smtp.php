@@ -171,6 +171,9 @@ class Smtp extends AbstractMailer implements MessengerInterface
                 if (! $resultCrypto) {
                     return false;
                 }
+
+                // Need to say hello again after sending STARTTLS command.
+                $result['hello'] = $this->sendCmd('HELO ' . $_SERVER['SERVER_NAME'], 250);
             }
 
             // Start login process.
@@ -229,7 +232,7 @@ class Smtp extends AbstractMailer implements MessengerInterface
             $result['send'] = $this->sendCmd($header . $message . "\r\n.\r\n", 250);
 
             // Sending process is complete.
-            $result['quit'] =  $this->sendCmd('QUIT', 221);
+            $result['quit'] =  $this->sendCmd('QUIT'); // 221
 
             fclose($this->smtp);
         }
@@ -295,7 +298,9 @@ class Smtp extends AbstractMailer implements MessengerInterface
         }
 
         if (! empty($responseBody) && $responseCode !== $answer) {
-            $this->success = false;
+            if (0 !== $answer) {
+                $this->success = false;
+            }
         }
 
         if (! $responseBody || substr($responseBody, 3, 1) !== ' ') {
