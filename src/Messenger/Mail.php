@@ -11,7 +11,8 @@
 namespace Messenger;
 
 use Messenger\Mailer\AbstractMailer;
-use Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerTrait;
 
 use function mail;
 use function wordwrap;

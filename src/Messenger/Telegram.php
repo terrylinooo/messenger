@@ -10,7 +10,9 @@
 
 namespace Messenger;
 
-use Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerTrait;
+
 use RuntimeException;
 
 use function curl_init;

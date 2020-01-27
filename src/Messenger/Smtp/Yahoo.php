@@ -8,17 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+namespace Messenger\Smtp;
 
-use Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerInterface;
+use Messenger\Smtp;
 
 /**
- * A very simple SMTP client for sending email via Outlook service.
- * 
+ * A very simple SMTP client for sending email via Yahoo mail service.
+ *
  * @author Terry L. <contact@terryl.in>
  * @since 1.3.0
  */
-class Office365Mail extends Smtp implements MessengerInterface
+class Yahoo extends Smtp implements MessengerInterface
 {
     /**
      * @param string $user    The username that you want to use to login to SMTP server.
@@ -27,6 +28,6 @@ class Office365Mail extends Smtp implements MessengerInterface
      */
     public function __construct(string $user, string $pass, int $timeout = 5)
     {
-        parent::__construct($user, $pass, 'tls://smtp.office365.com', 587, $timeout);
+        parent::__construct($user, $pass, 'ssl://smtp.mail.yahoo.com', 465, $timeout);
     }
 }

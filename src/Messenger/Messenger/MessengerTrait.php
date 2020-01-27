@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+namespace Messenger\Messenger;
 
 use function is_array;
 use function is_bool;

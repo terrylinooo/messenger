@@ -8,9 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+namespace Messenger\Smtp;
 
-use Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerInterface;
+use Messenger\Smtp;
 
 /**
  * A very simple SMTP client for sending email via Gmail service.
@@ -34,13 +35,18 @@ class Gmail extends Smtp implements MessengerInterface
     /**
      * @param string $user    The username that you want to use to login to SMTP server.
      * @param string $pass    The password of that user.
-     * @param string $type    ssl|tls - SSL or TLS protocol.
+     * @param mixed  $type    ssl|tls - SSL or TLS protocol.
      * @param int    $timeout After n seconds the connection will be stopped.
      */
-    public function __construct(string $user, string $pass, string $type = 'ssl', int $timeout = 5)
+    public function __construct(string $user, string $pass, $type = 'ssl', int $timeout = 5)
     {
+        if (is_numeric($type)) {
+            $timeout = (int) $type;
+            $type = 'ssl';
+        }
+
         if ($type === 'tls') {
-            $host = 'smtp.gmail.com';
+            $host = 'tls://smtp.gmail.com';
             $port = 587;
             $this->encryptionType = 'tls';
         }

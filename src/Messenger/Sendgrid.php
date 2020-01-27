@@ -11,7 +11,9 @@
 namespace Messenger;
 
 use Messenger\Mailer\AbstractMailer;
-use Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerInterface;
+use Messenger\Messenger\MessengerTrait;
+
 use RuntimeException;
 use stdClass;
 

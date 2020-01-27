@@ -13,9 +13,10 @@ Sending messages to the third-party services made easy for PHP.
 - SMTP
 - SendGrid
 - MailGun
-- MailGun SMTP
-- Gmail
-- Yahoo Mail
+- MailGun (SMTP)
+- Gmail (SMTP)
+- Yahoo (SMTP)
+- Outlook (SMTP)
 
 More modules will come in the future...
 
@@ -54,12 +55,11 @@ $channel = '@your_channel';
 
 $telegram = new \Messenger\Telegram($apiKey, $channel);
 
-$result = $telegram->send('say something!');
-
-if ($result) {
-    echo 'Message is sent.');
+if ($telegram->send('say something!')) {
+    echo 'Message has been sent to your Telegram group.');
 } else {
-    echo 'Failed to send message.';
+    echo 'Failed to send message.' . "\n";
+    echo $telegram->printResult();
 }
 ```
 
@@ -67,23 +67,22 @@ if ($result) {
 
 The access token can be obtained by clicking `Generate token` button at this [signup page](https://notify-bot.line.me/my/).
 
-Once you have obtained your developer access token for the chat group you choose, please invite `Line Notify` bot join your group, then the following code will work expectedly.
+Once you have obtained your developer access token for the chat group you choose, invite `Line Notify` bot join your Line group, then the following code will work as expected.
 
 ```php
 $accessToken = 'your_access_token';
 
 $line = new \Messenger\LineNotify($accessToken);
 
-$result = $line->send('say something!');
-
-if ($result) {
-    echo 'Message is sent.');
+if ($line->send('say something!')) {
+    echo 'Message has been sent to your Line group.');
 } else {
-    echo 'Failed to send message.';
+    echo 'Failed to send message.' . "\n";
+    echo $line->printResult();
 }
 ```
 
-### Rocket Chat
+### RocketChat
 
 ```php
 $accessToken = 'your_auth_token';
@@ -93,12 +92,11 @@ $channel = '#general';
 
 $rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $channel);
 
-$result = $rocketChat->send('say something!');
-
-if ($result) {
-    echo 'Message is sent.');
+if ($rocketChat->send('say something!')) {
+    echo 'Message has been sent to your RocketChat channel.');
 } else {
-    echo 'Failed to send message.';
+    echo 'Failed to send message.' . "\n";
+    echo $rocketChat->printResult();
 }
 ```
 
@@ -120,12 +118,11 @@ $channel = '#general';
 
 $slack = new \Messenger\Slack($botToken, $channel);
 
-$result = $slack->send('say something!');
-
-if ($result) {
-    echo 'Message is sent.');
+if ($slack->send('say something!')) {
+    echo 'Message has been sent to your Slack channel.');
 } else {
-    echo 'Failed to send message.';
+    echo 'Failed to send message.' . "\n";
+    echo $slack->printResult();
 }
 ```
 
@@ -138,13 +135,13 @@ $webhook = 'https://hooks.slack.com/services/TG7QMTHUH/BSZNJ7223/sYuEKprysz7a82e
 
 $slack = new \Messenger\SlackWebhook($webhook);
 
-$result = $slack->send('say something!');
-
-if ($result) {
-    echo 'Message is sent.');
+if ($slack->send('say something!')) {
+    echo 'Message has been sent to your Slack channel.');
 } else {
-    echo 'Failed to send message.';
+    echo 'Failed to send message.' . "\n";
+    echo $slack->printResult();
 }
+
 ```
 
 ok.
@@ -167,9 +164,11 @@ Public API methods:
 - debugMode
 - printResult
 
+There is no need to metion content type when using Mailer, the content type is automatically detected.
+
 ### Mail
 
-Native PHP mail function.
+Native PHP mail function. To use this class, be sure you have set the settings right in your `php.ini`.
 
 ```php
 $mail = new \Messenger\Mail();
@@ -177,12 +176,11 @@ $mail->addSender('example.sender@gmail.com');
 $mail->addRecipient('example.recipient@gmail.com');
 $mail->setSubject('Foo, bar.')
 
-$result = $mail->send('say something!');
-
-if ($result) {
-    echo 'Email is sent.');
+if ($mail->send('say something!')) {
+    echo 'Email has been delivered via PHP\'s native mail function.');
 } else {
-    echo 'Failed to send email.';
+    echo 'Failed to send email.' . "\n";
+    echo $maingun->printResult();
 }
 ```
 
@@ -203,13 +201,23 @@ $mail->addSender('email@your_domain.com');
 $mail->addRecipient('do-not-reply@gmail.com');
 $mail->setSubject('Foo, bar.');
 
-$result = $mail->send('say something!');
-
-if ($result) {
-    echo 'Email is sent.');
+if ($mail->send('say something!')) {
+    echo 'Email has been delivered via SMTP.');
 } else {
-    echo 'Failed to send email.';
+    echo 'Failed to send email.' . "\n";
+    echo $maingun->printResult();
 }
+```
+
+Note:
+
+If you would like to use **SMTPS** or **STARTTLS**, the `$host` should have a prefix. 
+
+For example:
+
+```php
+$host = 'ssl://smtp.gmail.com'; // SMTPS
+$host = 'tls://smtp.gmail.com'; // STARTTLS
 ```
 
 ### SendGrid
@@ -224,12 +232,11 @@ $sendgrid->addSender('example.sender@gmail.com');
 $sendgrid->addRecipient('example.recipient@gmail.com');
 $sendgrid->setSubject('Foo, bar.')
 
-$result = $sendgrid->send('say something!');
-
-if ($result) {
-    echo 'Email is sent.');
+if ($sendgrid->send('say something!')) {
+    echo 'Email has been delivered via SendGrid API.');
 } else {
-    echo 'Failed to send email.';
+    echo 'Failed to send email.' . "\n";
+    echo $maingun->printResult();
 }
 ```
 
@@ -244,12 +251,11 @@ $maingun->addSender('example.sender@gmail.com');
 $maingun->addRecipient('example.recipient@gmail.com');
 $maingun->setSubject('Foo, bar.')
 
-$result = $maingun->send('say something!');
-
-if ($result) {
-    echo 'Email is sent.');
+if ($maingun->send('say something!')) {
+    echo 'Email has been delivered via MailGun API.');
 } else {
-    echo 'Failed to send email.';
+    echo 'Failed to send email.' . "\n";
+    echo $maingun->printResult();
 }
 ```
 
@@ -262,16 +268,16 @@ $user = 'your@gmail.com';
 $pass = 'your_password';
 
 $maingun = new \Messenger\MailgunSmtp($user, $pass);
+
 $maingun->addSender('example.sender@gmail.com');
 $maingun->addRecipient('example.recipient@gmail.com');
 $maingun->setSubject('Foo, bar.')
 
-$result = $maingun->send('say something!');
-
-if ($result) {
-    echo 'Email is sent.');
+if ($maingun->send('say something!')) {
+    echo 'Email has been delivered via MainGun SMTP server.');
 } else {
-    echo 'Failed to send email.';
+    echo 'Failed to send email.' . "\n";
+    echo $maingun->printResult();
 }
 ```
 
@@ -280,46 +286,20 @@ if ($result) {
 Extended from `Smtp`, a ready-to-use Gmail SMTP client.
 
 ```php
-
 $user = 'your@gmail.com';
 $pass = 'your_password';
 
-$gmail = new \Messenger\Gmail($user, $pass);
+$gmail = new \Messenger\Smtp\Gmail($user, $pass);
 
 $gmail->addSender('your@gmail.com');
 $gmail->addRecipient('test@gmail.com');
 $gmail->setSubject('Foo, bar.');
 
-$result = $gmail->send('say something!');
-
-if ($result) {
-    echo 'Email is sent.');
+if ($gmail->send('say something!')) {
+    echo 'Email has been delivered via Gmail SMTP server.');
 } else {
-    echo 'Failed to send email.';
-}
-```
-
-### Yahoo Mail
-
-Extended from `Smtp`, a ready-to-use Yahoo SMTP client.
-
-```php
-
-$user = 'your@yahoo.com';
-$pass = 'your_password';
-
-$yahooMail = new \Messenger\YahooMail($user, $pass);
-
-$yahooMail->addSender('your@yahoo.com');
-$yahooMail->addRecipient('test@gmail.com');
-$yahooMail->setSubject('Foo, bar.');
-
-$result = $yahooMail->send('say something!');
-
-if ($result) {
-    echo 'Email is sent.');
-} else {
-    echo 'Failed to send email.';
+    echo 'Failed to send email.' . "\n";
+    echo $gmail->printResult();
 }
 ```
 
@@ -330,13 +310,81 @@ Google doesn't like people use their SMTP server to sending email by scripts, to
 - Check your Google Accounts -> Access for less secure apps -> Turn on
 - Use your host where you use to send email with your Google account and confirm that you have trusted the device on.
 
+### Yahoo Mail
+
+Extended from `Smtp`, a ready-to-use Yahoo SMTP client.
+
+
+```php
+$user = 'your@yahoo.com';
+$pass = 'your_password';
+
+$yahooMail = new \Messenger\Smtp\Yahoo($user, $pass);
+
+$yahooMail->addSender('your@yahoo.com');
+$yahooMail->addRecipient('test@gmail.com');
+$yahooMail->setSubject('Foo, bar.');
+
+if ($yahooMail->send('say something!')) {
+    echo 'Email has been delivered via Yahoo SMTP server.');
+} else {
+    echo 'Failed to send email.' . "\n";
+    echo $yahooMail->printResult();
+}
+```
+
+Note: You can use your account password but if you are facing the following error:
+
+```
+(#AUTH005) Too many bad auth attempts error when trying to send email.
+```
+
+That is because that Yahoo might not allow 3rd-party products access the SMTP server by default. To resolve this problem:
+
+- Go to [Account Security](https://login.yahoo.com/account/security), 
+- Under **Manage App password** section, create a password for that App.
+- Use your App password instead of your account password.
+
+
+### Outlook Mail (Office365)
+
+Extended from `Smtp`, a ready-to-use Yahoo SMTP client.
+
+
+```php
+$user = 'your@outlook.com';
+$pass = 'your_password';
+
+$outlook = new \Messenger\Smtp\Outlook($user, $pass);
+
+$outlook->addSender('your@outlook.com');
+$outlook->addRecipient('test@gmail.com');
+$outlook->setSubject('Foo, bar.');
+
+if ($outlook->send('say something!')) {
+    echo 'Email has been delivered via Office365 SMTP server.');
+} else {
+    echo 'Failed to send email.' . "\n";
+    echo $yahooMail->printResult();
+}
+```
+
+Note:
+
+When sending email via Office365 SMTP server at the first time, you will receive a notification email from *Outlook.com Team* to confirm your activity.
+
+![](https://i.imgur.com/F4YlKkg.png)
+
+Once you have completed the validation, you will be able to send email via Office365 SMTP server.
+
+
 ---
 
 ## Debug
 
 ### debugMode()
 
-If you would like to catch exceptions, you use turn `debugMode` on.
+If you would like to catch exceptions, you use turn `debugMode` on. This option will throw exceptions when error occurred.
 
 For example:
 
