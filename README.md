@@ -267,7 +267,7 @@ Extended from `Smtp`, a ready-to-use MailGun SMTP client.
 $user = 'your@gmail.com';
 $pass = 'your_password';
 
-$maingun = new \Messenger\MailgunSmtp($user, $pass);
+$maingun = new \Messenger\Smtp/Mailgun($user, $pass);
 
 $maingun->addSender('example.sender@gmail.com');
 $maingun->addRecipient('example.recipient@gmail.com');
