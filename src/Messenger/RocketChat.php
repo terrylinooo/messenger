@@ -72,7 +72,7 @@ class RocketChat implements MessengerInterface
         $this->accessToken = $accessToken;
         $this->userId = $userId;
         $this->serverUrl = $serverUrl;
-        $this->general = $channel;
+        $this->channel = $channel;
         $this->timeout = $timeout;
     }
 
