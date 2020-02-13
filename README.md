@@ -56,7 +56,7 @@ $channel = '@your_channel';
 $telegram = new \Messenger\Telegram($apiKey, $channel);
 
 if ($telegram->send('say something!')) {
-    echo 'Message has been sent to your Telegram group.');
+    echo 'Message has been sent to your Telegram group.';
 } else {
     echo 'Failed to send message.' . "\n";
     echo $telegram->printResult();
@@ -75,7 +75,7 @@ $accessToken = 'your_access_token';
 $line = new \Messenger\LineNotify($accessToken);
 
 if ($line->send('say something!')) {
-    echo 'Message has been sent to your Line group.');
+    echo 'Message has been sent to your Line group.';
 } else {
     echo 'Failed to send message.' . "\n";
     echo $line->printResult();
@@ -93,7 +93,7 @@ $channel = '#general';
 $rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $channel);
 
 if ($rocketChat->send('say something!')) {
-    echo 'Message has been sent to your RocketChat channel.');
+    echo 'Message has been sent to your RocketChat channel.';
 } else {
     echo 'Failed to send message.' . "\n";
     echo $rocketChat->printResult();
@@ -119,7 +119,7 @@ $channel = '#general';
 $slack = new \Messenger\Slack($botToken, $channel);
 
 if ($slack->send('say something!')) {
-    echo 'Message has been sent to your Slack channel.');
+    echo 'Message has been sent to your Slack channel.';
 } else {
     echo 'Failed to send message.' . "\n";
     echo $slack->printResult();
@@ -136,7 +136,7 @@ $webhook = 'https://hooks.slack.com/services/TG7QMTHUH/BSZNJ7223/sYuEKprysz7a82e
 $slack = new \Messenger\SlackWebhook($webhook);
 
 if ($slack->send('say something!')) {
-    echo 'Message has been sent to your Slack channel.');
+    echo 'Message has been sent to your Slack channel.';
 } else {
     echo 'Failed to send message.' . "\n";
     echo $slack->printResult();
@@ -174,10 +174,10 @@ Native PHP mail function. To use this class, be sure you have set the settings r
 $mail = new \Messenger\Mail();
 $mail->addSender('example.sender@gmail.com');
 $mail->addRecipient('example.recipient@gmail.com');
-$mail->setSubject('Foo, bar.')
+$mail->setSubject('Foo, bar.');
 
 if ($mail->send('say something!')) {
-    echo 'Email has been delivered via PHP\'s native mail function.');
+    echo 'Email has been delivered via PHP\'s native mail function.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $maingun->printResult();
@@ -202,7 +202,7 @@ $mail->addRecipient('do-not-reply@gmail.com');
 $mail->setSubject('Foo, bar.');
 
 if ($mail->send('say something!')) {
-    echo 'Email has been delivered via SMTP.');
+    echo 'Email has been delivered via SMTP.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $maingun->printResult();
@@ -230,10 +230,10 @@ $apiKey = 'your_api_key';
 $sendgrid = new \Messenger\Sendgrid($apiKey);
 $sendgrid->addSender('example.sender@gmail.com');
 $sendgrid->addRecipient('example.recipient@gmail.com');
-$sendgrid->setSubject('Foo, bar.')
+$sendgrid->setSubject('Foo, bar.');
 
 if ($sendgrid->send('say something!')) {
-    echo 'Email has been delivered via SendGrid API.');
+    echo 'Email has been delivered via SendGrid API.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $maingun->printResult();
@@ -249,10 +249,10 @@ $domain = 'your_domain_name';
 $maingun = new \Messenger\Mailgun($apiKey, $domain);
 $maingun->addSender('example.sender@gmail.com');
 $maingun->addRecipient('example.recipient@gmail.com');
-$maingun->setSubject('Foo, bar.')
+$maingun->setSubject('Foo, bar.');
 
 if ($maingun->send('say something!')) {
-    echo 'Email has been delivered via MailGun API.');
+    echo 'Email has been delivered via MailGun API.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $maingun->printResult();
@@ -271,10 +271,10 @@ $maingun = new \Messenger\Smtp/Mailgun($user, $pass);
 
 $maingun->addSender('example.sender@gmail.com');
 $maingun->addRecipient('example.recipient@gmail.com');
-$maingun->setSubject('Foo, bar.')
+$maingun->setSubject('Foo, bar.');
 
 if ($maingun->send('say something!')) {
-    echo 'Email has been delivered via MainGun SMTP server.');
+    echo 'Email has been delivered via MainGun SMTP server.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $maingun->printResult();
@@ -296,7 +296,7 @@ $gmail->addRecipient('test@gmail.com');
 $gmail->setSubject('Foo, bar.');
 
 if ($gmail->send('say something!')) {
-    echo 'Email has been delivered via Gmail SMTP server.');
+    echo 'Email has been delivered via Gmail SMTP server.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $gmail->printResult();
@@ -326,7 +326,7 @@ $yahooMail->addRecipient('test@gmail.com');
 $yahooMail->setSubject('Foo, bar.');
 
 if ($yahooMail->send('say something!')) {
-    echo 'Email has been delivered via Yahoo SMTP server.');
+    echo 'Email has been delivered via Yahoo SMTP server.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $yahooMail->printResult();
@@ -362,7 +362,7 @@ $outlook->addRecipient('test@gmail.com');
 $outlook->setSubject('Foo, bar.');
 
 if ($outlook->send('say something!')) {
-    echo 'Email has been delivered via Office365 SMTP server.');
+    echo 'Email has been delivered via Office365 SMTP server.';
 } else {
     echo 'Failed to send email.' . "\n";
     echo $yahooMail->printResult();
