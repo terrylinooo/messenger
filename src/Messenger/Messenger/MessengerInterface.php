@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger\Messenger;
+namespace Shieldon\Messenger\Messenger;
 
 /**
  * Messenger Interface

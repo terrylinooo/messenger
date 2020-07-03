@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the Messenger package.
+ * This file is part of the Shieldon Messenger package.
  *
  * (c) Terry L. <contact@terryl.in>
  *
@@ -8,32 +8,60 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+namespace Shieldon\Messenger;
 
 /**
  * Autoloader
  * 
  * A PRS-4 autoloader for the developers who don't want to use PHP Composer.
- *
- * @author Terry L. <contact@terryl.in>
- * @since 1.0.0
+ */
+/**
+ * Autoloader
+ * 
+ * A PRS-4 autoloader for the developers who don't want to use PHP Composer.
  */
 class Autoloader
 {
+    /**
+     * Current directory.
+     *
+     * @var string
+     */
     private $dir;
+
+    /**
+     * The namespace prefix.
+     *
+     * @var string
+     */
     private $prefix;
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->dir = __DIR__;
         $this->prefix = __NAMESPACE__ . '\\';
     }
 
+    /**
+     * Register
+     *
+     * @return void
+     */
     public static function register()
     {
-        spl_autoload_register(array(new self(), 'autoload'), true, false);
+        spl_autoload_register([new self(), 'autoload'], true, false);
     }
 
+    /**
+     * Autoload
+     *
+     * @param string $className
+     * 
+     * @return void
+     */
     public function autoload($className)
     {
         if (0 === strpos($className, $this->prefix)) {

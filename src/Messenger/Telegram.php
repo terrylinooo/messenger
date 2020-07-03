@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Messenger package.
  *
@@ -8,10 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+declare(strict_types=1);
 
-use Messenger\Messenger\MessengerInterface;
-use Messenger\Messenger\MessengerTrait;
+namespace Shieldon\Messenger;
+
+use Shieldon\Messenger\Messenger\MessengerInterface;
+use Shieldon\Messenger\Messenger\MessengerTrait;
 
 use RuntimeException;
 
@@ -53,7 +55,7 @@ class Telegram implements MessengerInterface
     /**
      * @param string $apiKey  Telegram bot access token provided by BotFather
      * @param string $channel Telegram channel name
-     * @param int    $timeout     After n seconds the connection will be stopped.
+     * @param int    $timeout After n seconds the connection will be stopped.
      */
     public function __construct(string $apiKey, string $channel, int $timeout = 5)
     {

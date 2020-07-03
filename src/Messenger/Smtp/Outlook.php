@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger\Smtp;
+namespace Shieldon\Messenger\Smtp;
 
-use Messenger\Messenger\MessengerInterface;
-use Messenger\Smtp;
+use Shieldon\Messenger\Messenger\MessengerInterface;
+use Shieldon\Messenger\Smtp;
 
 /**
  * A very simple SMTP client for sending email via Outlook service.

@@ -30,7 +30,7 @@ composer require shieldon/messenger
 
 Or, download it and include the Messenger autoloader.
 ```php
-require 'Messenger/autoload.php';
+require './autoload.php';
 ```
 
 ## Basic Usage
@@ -53,7 +53,7 @@ Remember, make sure your channel type is public. If you want to send messages to
 $apiKey = 'your_api_key';
 $channel = '@your_channel';
 
-$telegram = new \Messenger\Telegram($apiKey, $channel);
+$telegram = new \Shieldon\Messenger\Telegram($apiKey, $channel);
 
 if ($telegram->send('say something!')) {
     echo 'Message has been sent to your Telegram group.';
@@ -72,7 +72,7 @@ Once you have obtained your developer access token for the chat group you choose
 ```php
 $accessToken = 'your_access_token';
 
-$line = new \Messenger\LineNotify($accessToken);
+$line = new \Shieldon\Messenger\LineNotify($accessToken);
 
 if ($line->send('say something!')) {
     echo 'Message has been sent to your Line group.';
@@ -90,7 +90,7 @@ $userId = 'your_user_id';
 $serverUrl = 'https://your_rocket_chat.com:3000';
 $channel = '#general';
 
-$rocketChat = new \Messenger\RocketChat($accessToken, $userId, $serverUrl, $channel);
+$rocketChat = new \Shieldon\Messenger\RocketChat($accessToken, $userId, $serverUrl, $channel);
 
 if ($rocketChat->send('say something!')) {
     echo 'Message has been sent to your RocketChat channel.';
@@ -116,7 +116,7 @@ Guide:
 $botToken = 'xoxb-551837935968-920623655894-TI1zWtaDLCkTzZaFFuyfzL56';
 $channel = '#general';
 
-$slack = new \Messenger\Slack($botToken, $channel);
+$slack = new \Shieldon\Messenger\Slack($botToken, $channel);
 
 if ($slack->send('say something!')) {
     echo 'Message has been sent to your Slack channel.';
@@ -133,7 +133,7 @@ This would be the simplest way for messaging. Please clearfully read Slack's off
 ```php
 $webhook = 'https://hooks.slack.com/services/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';
 
-$slack = new \Messenger\SlackWebhook($webhook);
+$slack = new \Shieldon\Messenger\SlackWebhook($webhook);
 
 if ($slack->send('say something!')) {
     echo 'Message has been sent to your Slack channel.';
@@ -171,7 +171,7 @@ There is no need to metion content type when using Mailer, the content type is a
 Native PHP mail function. To use this class, be sure you have set the settings right in your `php.ini`.
 
 ```php
-$mail = new \Messenger\Mail();
+$mail = new \Shieldon\Messenger\Mail();
 $mail->addSender('example.sender@gmail.com');
 $mail->addRecipient('example.recipient@gmail.com');
 $mail->setSubject('Foo, bar.');
@@ -195,7 +195,7 @@ $pass = '12345678';
 $host = '127.0.0.1';
 $port = '25';
 
-$mail = new \Messenger\Smtp($user, $pass, $host, $port);
+$mail = new \Shieldon\Messenger\Smtp($user, $pass, $host, $port);
 
 $mail->addSender('email@your_domain.com');
 $mail->addRecipient('do-not-reply@gmail.com');
@@ -227,7 +227,7 @@ If you have SendGrid API key, you can also send messages via SendGrid easily.
 ```php
 $apiKey = 'your_api_key';
 
-$sendgrid = new \Messenger\Sendgrid($apiKey);
+$sendgrid = new \Shieldon\Messenger\Sendgrid($apiKey);
 $sendgrid->addSender('example.sender@gmail.com');
 $sendgrid->addRecipient('example.recipient@gmail.com');
 $sendgrid->setSubject('Foo, bar.');
@@ -246,7 +246,7 @@ if ($sendgrid->send('say something!')) {
 $apiKey = 'your_api_key';
 $domain = 'your_domain_name';
 
-$maingun = new \Messenger\Mailgun($apiKey, $domain);
+$maingun = new \Shieldon\Messenger\Mailgun($apiKey, $domain);
 $maingun->addSender('example.sender@gmail.com');
 $maingun->addRecipient('example.recipient@gmail.com');
 $maingun->setSubject('Foo, bar.');
@@ -267,7 +267,7 @@ Extended from `Smtp`, a ready-to-use MailGun SMTP client.
 $user = 'your@gmail.com';
 $pass = 'your_password';
 
-$maingun = new \Messenger\Smtp/Mailgun($user, $pass);
+$maingun = new \Shieldon\Messenger\Smtp\Mailgun($user, $pass);
 
 $maingun->addSender('example.sender@gmail.com');
 $maingun->addRecipient('example.recipient@gmail.com');
@@ -289,7 +289,7 @@ Extended from `Smtp`, a ready-to-use Gmail SMTP client.
 $user = 'your@gmail.com';
 $pass = 'your_password';
 
-$gmail = new \Messenger\Smtp\Gmail($user, $pass);
+$gmail = new \Shieldon\Messenger\Smtp\Gmail($user, $pass);
 
 $gmail->addSender('your@gmail.com');
 $gmail->addRecipient('test@gmail.com');
@@ -319,7 +319,7 @@ Extended from `Smtp`, a ready-to-use Yahoo SMTP client.
 $user = 'your@yahoo.com';
 $pass = 'your_password';
 
-$yahooMail = new \Messenger\Smtp\Yahoo($user, $pass);
+$yahooMail = new \Shieldon\Messenger\Smtp\Yahoo($user, $pass);
 
 $yahooMail->addSender('your@yahoo.com');
 $yahooMail->addRecipient('test@gmail.com');
@@ -355,7 +355,7 @@ Extended from `Smtp`, a ready-to-use Yahoo SMTP client.
 $user = 'your@outlook.com';
 $pass = 'your_password';
 
-$outlook = new \Messenger\Smtp\Outlook($user, $pass);
+$outlook = new \Shieldon\Messenger\Smtp\Outlook($user, $pass);
 
 $outlook->addSender('your@outlook.com');
 $outlook->addRecipient('test@gmail.com');
@@ -389,7 +389,7 @@ If you would like to catch exceptions, you use turn `debugMode` on. This option 
 For example:
 
 ```php
-$mail = new \Messenger\Smtp($user, $pass, $host, $port);
+$mail = new \Shieldon\Messenger\Smtp($user, $pass, $host, $port);
 
 $mail->debugMode(true);
 
@@ -413,7 +413,7 @@ If you would like to print the executed results, you can use `printResult()`.
 For example:
 
 ```php
-$mail = new \Messenger\Smtp($user, $pass, $host, $port);
+$mail = new \Shieldon\Messenger\Smtp($user, $pass, $host, $port);
 $mail->addSender('email@your_domain.com');
 $mail->addRecipient('do-not-reply@gmail.com');
 $mail->setSubject('Foo, bar.');

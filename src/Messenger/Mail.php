@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Messenger package.
  *
@@ -8,11 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+declare(strict_types=1);
 
-use Messenger\Mailer\AbstractMailer;
-use Messenger\Messenger\MessengerInterface;
-use Messenger\Messenger\MessengerTrait;
+namespace Shieldon\Messenger;
+
+use Shieldon\Messenger\Mailer\AbstractMailer;
+use Shieldon\Messenger\Messenger\MessengerInterface;
+use Shieldon\Messenger\Messenger\MessengerTrait;
 
 use function mail;
 use function wordwrap;

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Messenger package.
  *
@@ -8,10 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+declare(strict_types=1);
 
-use Messenger\Messenger\MessengerInterface;
-use Messenger\Messenger\MessengerTrait;
+namespace Shieldon\Messenger;
+
+use Shieldon\Messenger\Messenger\MessengerInterface;
+use Shieldon\Messenger\Messenger\MessengerTrait;
 use RuntimeException;
 
 use function curl_init;

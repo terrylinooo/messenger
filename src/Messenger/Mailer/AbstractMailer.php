@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger\Mailer;
+namespace Shieldon\Messenger\Mailer;
 
-use Messenger\Mailer\MailerInterface;
+use Shieldon\Messenger\Mailer\MailerInterface;
 use RuntimeException;
 
 /**

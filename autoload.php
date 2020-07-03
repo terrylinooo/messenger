@@ -11,4 +11,4 @@
 
 require __DIR__. '/src/Messenger/Autoloader.php';
 
-Messenger\Autoloader::register();
+Shieldon\Messenger\Autoloader::register();

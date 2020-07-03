@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger\Mailer;
+namespace Shieldon\Messenger\Mailer;
 
 /**
  * Mailer Interface

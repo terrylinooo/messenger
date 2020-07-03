@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of the Messenger package.
  *
@@ -8,11 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Messenger;
+declare(strict_types=1);
 
-use Messenger\Mailer\AbstractMailer;
-use Messenger\Messenger\MessengerInterface;
-use Messenger\Messenger\MessengerTrait;
+namespace Shieldon\Messenger;
+
+use Shieldon\Messenger\Mailer\AbstractMailer;
+use Shieldon\Messenger\Messenger\MessengerInterface;
+use Shieldon\Messenger\Messenger\MessengerTrait;
 
 use RuntimeException;
 use stdClass;
@@ -42,8 +44,8 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
     private $apiKey = '';
 
     /**
-     * @param string $apiKey Your SendGrid API key.
-     * @param int    $timeout     After n seconds the connection will be stopped.
+     * @param string $apiKey  Your SendGrid API key.
+     * @param int    $timeout After n seconds the connection will be stopped.
      */
     public function __construct(string $apiKey, int $timeout = 5)
     {
