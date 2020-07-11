@@ -55,6 +55,8 @@ class LineNotify implements MessengerInterface
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -64,13 +66,6 @@ class LineNotify implements MessengerInterface
             'Content-type: '  . 'application/x-www-form-urlencoded',
             'Authorization: ' . 'Bearer ' . $this->accessToken,
         ]);
-
-        if ($this->quickClose) {
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 50);
-        } else {
-            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
-        }
 
         $ret = $this->executeCurl($ch);
 

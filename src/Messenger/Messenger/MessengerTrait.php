@@ -48,14 +48,6 @@ Trait MessengerTrait
     protected $debug = false;
 
     /**
-     * Open and close a connection between target server and self quicky to
-     * prevent blocking.
-     *
-     * @var bool
-     */
-    protected $quickClose = false;
-
-    /**
      * Print the connection result. (for debugging purpose)
      *
      * @param string $resturnType
@@ -124,9 +116,9 @@ Trait MessengerTrait
      *
      * @return void
      */
-    public function nonBlocking()
+    public function setTimeout(int $second)
     {
-        $this->quickClose = true;
+        $this->timeout = $second;
     }
 
     /**

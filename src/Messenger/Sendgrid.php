@@ -64,6 +64,8 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
         curl_setopt($ch, CURLOPT_URL, $this->provider());
         curl_setopt($ch, CURLOPT_POSTFIELDS, $message);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)');
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -73,13 +75,6 @@ class Sendgrid extends AbstractMailer implements MessengerInterface
             'Authorization: Bearer ' . $this->apiKey,
             'Content-Length: ' . strlen($message)
         ]);
-
-        if ($this->quickClose) {
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 50);
-        } else {
-            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
-        }
 
         $ret = $this->executeCurl($ch, true);
 
