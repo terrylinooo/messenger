@@ -85,7 +85,6 @@ class RocketChat implements MessengerInterface
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->provider());
-        curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->prepare($message));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -96,6 +95,13 @@ class RocketChat implements MessengerInterface
             'X-User-Id: ' . $this->userId,
             'X-Auth-Token: ' . $this->accessToken,
         ]);
+
+        if ($this->quickClose) {
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 50);
+        } else {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        }
 
         $ret = $this->executeCurl($ch);
 

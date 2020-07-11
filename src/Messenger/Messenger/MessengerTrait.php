@@ -48,6 +48,14 @@ Trait MessengerTrait
     protected $debug = false;
 
     /**
+     * Open and close a connection between target server and self quicky to
+     * prevent blocking.
+     *
+     * @var bool
+     */
+    protected $quickClose = false;
+
+    /**
      * Print the connection result. (for debugging purpose)
      *
      * @param string $resturnType
@@ -109,6 +117,16 @@ Trait MessengerTrait
     public function isDebug(): bool
     {
         return $this->debug;
+    }
+
+    /**
+     * Close the connection quickly.
+     *
+     * @return void
+     */
+    public function nonBlocking()
+    {
+        $this->quickClose = true;
     }
 
     /**
